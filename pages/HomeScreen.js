@@ -299,22 +299,23 @@ class HomeScreen extends React.Component{
       latitude: this.state.lat,
       longitude: this.state.lng
     }
-    const { carList, netWorkList, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible } = this.state
+    const { carList, netWorkList, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible, lat, lng } = this.state
     return (
       <View style={styles.container}>
       
           <MapView
             ref="map"
             showsLocationButton = {true}
+            rotateEnabled = {false}
             showsZoomControls = {true}
             zoomLevel = {15}
             style={{ height: '100%', height: '100%', backgroundColor: 'red', zIndex: 1 }}
-            coordinate={{"latitude":24.909844,
-            "longitude":118.602994}}
+            coordinate={{"latitude": lat,
+            "longitude": lng}}
             onStatusChangeComplete={this._logStatusChangeCompleteEvent}
           >
-            <Marker coordinate={{"latitude":24.909844,
-            "longitude":118.602994}} icon={() => (
+            <Marker coordinate={{"latitude": lat,
+            "longitude": lng}} icon={() => (
                 <Image source={IMAGES.pin} style={{ width: p(22), height: p(33) }}>
                 </Image>
             )}>

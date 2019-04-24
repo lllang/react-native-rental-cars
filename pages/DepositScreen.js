@@ -20,6 +20,8 @@ class DepositScreen extends React.Component{
       api('/api/dsDepositAudit/UserDepositAuditState', {}).then((res) => {
         if(res.data && res.data.success) {
           Toast.show('申请成功');
+          this.getDeposit();
+          this.isRefuned();
         } else {
           Toast.show(res.data && res.data.msg || '请求失败');
         }
@@ -30,6 +32,8 @@ class DepositScreen extends React.Component{
           this.setState({
             deposit: res.data.data,
           });
+          this.getDeposit();
+          this.isRefuned();
           Toast.show('押金提交成功');
         } else {
           Toast.show(res.data && res.data.msg || '请求失败');

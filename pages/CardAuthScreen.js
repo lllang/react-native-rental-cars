@@ -102,12 +102,12 @@ class CardAuthScreen extends React.Component{
           if (type === 'handleFile') {
             this.setState({
               handleFile: `data:image/jpeg;base64,${response.data}`,
-              front: res.data.data
+              front: `${host}${res.data.data}`
             });
           } else {
             this.setState({
               backFile: `data:image/jpeg;base64,${response.data}`,
-              end: res.data.data
+              end: `${host}${res.data.data}`
             })
           }
         })
@@ -118,15 +118,16 @@ class CardAuthScreen extends React.Component{
     const { userInfo } = this.props;
     const { front, end, cardType, code } = this.state;
     return (
-      <ScrollView style={styles.container}>
-      <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
-      <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this)}>
-        <Text style={styles.date}>{['', '身份证', '护照'][cardType] || '请选择'}</Text>
-      </TouchableOpacity>
-      </View>
-      <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
-        <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value }) }}/>
-      </View>
+      <View style={styles.container}>
+      <ScrollView >
+        <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
+        <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this)}>
+          <Text style={styles.date}>{['', '身份证', '护照'][cardType] || '请选择'}</Text>
+        </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
+          <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value }) }}/>
+        </View>
         <Text style={styles.text}>身份证正面</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'handleFile')}>
           <Image source={front ? {uri: front} : IMAGES.front} style={styles.image}/>
@@ -138,8 +139,9 @@ class CardAuthScreen extends React.Component{
         <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>
         </TouchableOpacity>
-        <Picker ref="picker" />
       </ScrollView>
+        <Picker ref="picker" />
+        </View>
     )
   }
 }
@@ -148,7 +150,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7fcfc',
-    paddingBottom: p(30),
   },
   input1: {
     marginTop: p(23),
@@ -172,6 +173,7 @@ const styles = StyleSheet.create({
   },
   submit: {
     marginTop: p(40),
+    marginBottom: p(40),
     width: p(300),
     height: p(50),
     backgroundColor: '#00B1A0',

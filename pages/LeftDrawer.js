@@ -42,11 +42,14 @@ class LeftDrawer extends React.Component{
         <Image source={IMAGES.back} style={styles.back}/>
         <Text style={styles.phone}>{userInfo && userInfo.name || ''}</Text>
         <TouchableOpacity style={styles.vip}>
-          <TouchableOpacity style={[styles.vipOpacity, userInfo && userInfo.type === 0 ? {} : styles.disabledVipOpacity]}>
-            <Text style={[styles.vipText, userInfo && userInfo.type === 0 ? {} : styles.disabledVipText]}>普通会员</Text>
+          <TouchableOpacity style={[styles.vipOpacity, userInfo && !userInfo.isUserCar && !userInfo.partner ? {} : styles.disabledVipOpacity]}>
+            <Text style={[styles.vipText, userInfo && !userInfo.isUserCar && !userInfo.partner ? {} : styles.disabledVipText]}>普通会员</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.vipOpacity, userInfo && userInfo.type === 0 ? styles.disabledVipOpacity : {}]}>
-            <Text style={[styles.vipText, userInfo && userInfo.type === 0 ? styles.disabledVipText : {}]}>车主会员</Text>
+          <TouchableOpacity style={[styles.vipOpacity, userInfo && userInfo.isUserCar ? {} : styles.disabledVipOpacity]}>
+            <Text style={[styles.vipText, userInfo && userInfo.isUserCar ? {} : styles.disabledVipText]}>车主会员</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.vipOpacity, userInfo && userInfo.partner ? {} : styles.disabledVipOpacity]}>
+            <Text style={[styles.vipText, userInfo && userInfo.partner ? {} : styles.disabledVipText]}>城市合伙人</Text>
           </TouchableOpacity>
         </TouchableOpacity>
         <TouchableOpacity style={styles.item} onPress={() => { this.jump('wallet') }}>
