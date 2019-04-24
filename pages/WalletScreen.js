@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native'
 import Toast from 'react-native-simple-toast';
 import { connect } from 'react-redux';
 import { p } from '../utils/resolutions'
@@ -16,7 +16,7 @@ class WalletScreen extends React.Component{
     headerTruncatedBackTitle: '返回',
   }
   state = {
-    rechargeArray: [10, 25, 50, 100, 200, 300],
+    rechargeArray: [50, 100, 200, 300, 500, 1000],
     checked: false,
   }
   submit = () => {
@@ -52,6 +52,18 @@ class WalletScreen extends React.Component{
           {this.state.rechargeArray.map(item => <TouchableOpacity key={item} style={styles.rechargeItem}>
             <Text style={styles.rechargeNum}>{item}元</Text>
           </TouchableOpacity>)}
+          <TouchableOpacity style={styles.rechargeItem}>
+            <Text style={styles.rechargeNum}>自定义</Text>
+          </TouchableOpacity>
+          <TextInput></TextInput>
+        </View>
+        <View style={styles.recharge}>
+          <TouchableOpacity style={styles.rechargeItem}>
+            <Text style={styles.rechargeNum}>微信支付</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.rechargeItem}>
+            <Text style={styles.rechargeNum}>支付宝支付</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.deal}>
         <TouchableOpacity onPress={() => { this.setState({ checked: !this.state.checked })} }>

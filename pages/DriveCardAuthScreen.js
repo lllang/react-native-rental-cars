@@ -101,7 +101,8 @@ class DriveCardAuthScreen extends React.Component{
   render() {
     const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code } = this.state;
     return (
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
+      <ScrollView>
       <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
         <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value }) }}/>
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this, 'driverLicenseStartTime')}>
@@ -118,8 +119,9 @@ class DriveCardAuthScreen extends React.Component{
         <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>
         </TouchableOpacity>
-        <DatePicker ref="datePicker" />
       </ScrollView>
+        <DatePicker ref="datePicker" />
+      </View>
     )
   }
 }

@@ -6,7 +6,20 @@ import { api } from '../utils/request'
 import host from '../utils/config'
 import format from 'date-fns/format';
 
-const tabs = ['预约', '使用中', '待付款', '待到账', '已完成', '违章', '取消订单'];
+// const tabs = ['预约', '使用中', '待付款', '待到账', '已完成', '违章', '取消订单'];
+const tabs = [{
+  name: '使用中',
+  value: 1,
+}, {
+  name: '待付款',
+  value: 2,
+}, {
+  name: '违章待查询',
+  value: 7,
+}, {
+  name: '已完成',
+  value: 4,
+}]
 
 export default class OrderScreen extends React.Component{
   static navigationOptions = {
@@ -85,7 +98,7 @@ export default class OrderScreen extends React.Component{
         <View style={{ justifyContent: 'center' }}>
         <View style={styles.itemTop}>
           <Text style={styles.type}>车牌{item.dsCar && item.dsCar.carId}</Text>
-          <View style={[styles.numView, {backgroundColor: colors[item.type]}]}><Text style={[styles.num]}>{tabs[item.type]}</Text></View>
+          <View style={[styles.numView, {backgroundColor: colors[item.type]}]}><Text style={[styles.num]}>{tabs[item.type].name}</Text></View>
         </View>
         <Text style={styles.time}>开始时间：{format(item.returnStartTime, 'YYYY/MM/DD HH:mm:ss')}</Text>
         </View>
@@ -104,12 +117,12 @@ export default class OrderScreen extends React.Component{
     return (
       <View style={styles.container}>
         <View style={styles.tabs}>
-          {tabs.map((item, index) =>
+          {tabs.map((item) =>
             <TouchableOpacity
-              onPress={() => { this.setState({ state: index, pn: 1 }, this.search); }}
-              key={index}
-              style={index === state ? [styles.tab, styles.active] : styles.tab}>
-              <Text style={styles.tabText}>{item}</Text>
+              onPress={() => { this.setState({ state: item.value, pn: 1 }, this.search); }}
+              key={item.value}
+              style={item.value === state ? [styles.tab, styles.active] : styles.tab}>
+              <Text style={styles.tabText}>{item.name}</Text>
             </TouchableOpacity>)}
         </View>
         {list && list.length > 0 ? <RefreshListView style={styles.listMain}
