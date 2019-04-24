@@ -35,6 +35,9 @@ class CardAuthScreen extends React.Component{
     if (!code || !end || !front || !cardType) {
       Toast.show('请填写完整信息');
     }
+    if (!/[0-9xX]/g.test(code)) {
+      Toast.show('请检查证件号码');
+    }
     api('/api/dsUserInfo/saveUpdate', {
       cardId: this.state.code,
       cardType: cardType,
@@ -126,7 +129,7 @@ class CardAuthScreen extends React.Component{
         </TouchableOpacity>
         </View>
         <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
-          <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value }) }}/>
+          <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9Xx]/g, '') }) }}/>
         </View>
         <Text style={styles.text}>身份证正面</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'handleFile')}>

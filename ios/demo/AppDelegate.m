@@ -11,6 +11,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
+#import <React/RCTLinkingManager.h>
 
 @implementation AppDelegate
 
@@ -38,6 +39,11 @@
   [AMapServices sharedServices].apiKey = @"9c80c09fa98f3941dd7cd4cf62664d79";
   [self.window makeKeyAndVisible];
   return YES;
+}
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
+            options:(NSDictionary<NSString*, id> *)options
+{
+  return [RCTLinkingManager application:application openURL:url options:options];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

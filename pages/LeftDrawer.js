@@ -23,7 +23,6 @@ class LeftDrawer extends React.Component{
     actions: PropTypes.object,
   };
   async logout() {
-    console.log(this);
     actions.updateUserInfo({});
     await setAuth({});
     Toast.show('退出登录成功');

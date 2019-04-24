@@ -302,7 +302,11 @@ class HomeScreen extends React.Component{
     const { carList, netWorkList, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible, lat, lng } = this.state
     return (
       <View style={styles.container}>
-      
+       <View style={styles.header}>
+          <TouchableOpacity style={styles.iconUserOpacity} onPress={this.openDrawer}>
+            <Image source={IMAGES.user} style={styles.iconUser}/>
+          </TouchableOpacity>
+        </View>
           <MapView
             ref="map"
             showsLocationButton = {true}
@@ -465,11 +469,7 @@ class HomeScreen extends React.Component{
             </View>
           </View>
         </View> : null}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.iconUserOpacity} onPress={this.openDrawer}>
-            <Image source={IMAGES.user} style={styles.iconUser}/>
-          </TouchableOpacity>
-        </View>
+       
         <Modal visible={visible} onPress={() => {this.setState({visible: false})}}>
           <Text>最新密码为{psw || useCarInfo.password}</Text>
         </Modal>
@@ -486,7 +486,6 @@ const styles = StyleSheet.create({
   },
   header: {
     height: p(40),
-    position: 'absolute',
     zIndex: 9,
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     width: '100%',

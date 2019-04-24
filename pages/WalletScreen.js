@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native'
 import Toast from 'react-native-simple-toast';
 import { connect } from 'react-redux';
 import { p } from '../utils/resolutions'
@@ -18,6 +18,9 @@ class WalletScreen extends React.Component{
   state = {
     rechargeArray: [50, 100, 200, 300, 500, 1000],
     checked: false,
+    show: true,
+    recharge: 0,
+    payType: 'wechat',
   }
   submit = () => {
     if(!this.state.checked) {
@@ -27,8 +30,9 @@ class WalletScreen extends React.Component{
   }
   render() {
     const { userInfo } = this.props
+    const { show, recharge, payType } = this.state
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.card}>
           <View style={styles.amount}>
             <Text style={styles.amountText}>账户余额</Text>
@@ -49,20 +53,38 @@ class WalletScreen extends React.Component{
         </View>
         <Text style={styles.rechargeText}>快速充值</Text>
         <View style={styles.recharge}>
-          {this.state.rechargeArray.map(item => <TouchableOpacity key={item} style={styles.rechargeItem}>
-            <Text style={styles.rechargeNum}>{item}元</Text>
+          {this.state.rechargeArray.map(item => <TouchableOpacity key={item} style={styles.rechargeItem} onPress={() => {
+            this.setState({
+              recharge: item,
+              show: false,
+            })
+          }}>
+            <Text style={recharge === item ? styles.rechargeNum : styles.disabledText}>{item}元</Text>
           </TouchableOpacity>)}
-          <TouchableOpacity style={styles.rechargeItem}>
-            <Text style={styles.rechargeNum}>自定义</Text>
+          <TouchableOpacity style={styles.rechargeItem} onPress={() => {
+            this.setState({
+              show: true,
+              recharge: 0,
+            })
+          }}>
+            <Text style={show ? styles.rechargeNum : styles.disabledText}>自定义</Text>
           </TouchableOpacity>
-          <TextInput></TextInput>
+          {show ? <TextInput placeholder="请输入自定义金额" type="numeric" style={styles.input}></TextInput> : null}
         </View>
         <View style={styles.recharge}>
-          <TouchableOpacity style={styles.rechargeItem}>
-            <Text style={styles.rechargeNum}>微信支付</Text>
+          <TouchableOpacity style={styles.rechargeItem} onPress={() => {
+            this.setState({
+              payType: 'wechat',
+            })
+          }}>
+            <Text style={payType === 'wechat' ? styles.rechargeNum : styles.disabledText}>微信支付</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.rechargeItem}>
-            <Text style={styles.rechargeNum}>支付宝支付</Text>
+          <TouchableOpacity style={styles.rechargeItem} onPress={() => {
+            this.setState({
+              payType: 'alipay',
+            })
+          }}>
+            <Text style={payType === 'alipay' ? styles.rechargeNum : styles.disabledText}>支付宝支付</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.deal}>
@@ -80,7 +102,7 @@ class WalletScreen extends React.Component{
         <TouchableOpacity style={[styles.submit, this.state.checked ? {} : styles.disabled]} onPress={this.submit}>
           <Text style={styles.submitText}>确认充值</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     )
   }
 }
@@ -93,16 +115,16 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   card: {
-    height: p(160),
+    height: p(140),
     backgroundColor: '#00b1a0',
     borderRadius: p(15),
     overflow: 'hidden',
-    paddingTop: p(32),
+    paddingTop: p(22),
     paddingLeft: p(21),
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    paddingBottom: p(33),
+    paddingBottom: p(23),
     paddingRight: p(15),
   },
   amount: {
@@ -159,24 +181,25 @@ const styles = StyleSheet.create({
     color: '#00b1a0',
     fontSize: p(15),
   },
+  disabledText: {
+    color: '#999',
+  },
   submit: {
+    marginTop: p(10),
     height: p(45),
     width: p(322),
-    left: p(27),
     borderRadius: p(23),
     backgroundColor: '#00b1a0',
     alignItems: 'center',
+    alignSelf: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    bottom: p(50),
   },
   submitText: {
     color: '#fff',
     fontSize: p(15),
   },
   deal: {
-    position: 'absolute',
-    bottom: p(110),
+    marginTop: p(10),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -198,6 +221,15 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: '#999',
+  },
+  input: {
+    fontSize: p(16),
+    borderWidth: p(1),
+    borderColor: '#e5e5e5',
+    padding: 0,
+    marginBottom: p(11),
+    width: p(200),
+    paddingLeft: p(9), 
   }
 })
 export default connect(state => ({

@@ -31,7 +31,7 @@ export default class OrderScreen extends React.Component{
     pn: 1,
     refreshState: RefreshState.Idle,
     hasNext: true,
-    state: 0,
+    state: 1,
   }
   search = () => {
     const { pn, ps, state } = this.state;
