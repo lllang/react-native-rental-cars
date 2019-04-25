@@ -1,10 +1,12 @@
 import React from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, Modal } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, Modal, Linking, Platform } from 'react-native'
 import { MapView, Marker } from 'react-native-amap3d'
 import { p } from '../utils/resolutions'
 import PropTypes from 'prop-types'
+import { getAuth } from '../utils/storage'
 import { post, api } from '../utils/request'
 import Picker from '../components/Picker';
+import Mask from '../components/Mask';
 import host from '../utils/config'
 import { connect } from 'react-redux'
 import Toast from 'react-native-simple-toast'
@@ -29,6 +31,8 @@ class HomeScreen extends React.Component{
   }
   state = {
     lat: 39.91095,
+    firstLat: '',
+    firstLng: '',
     lng: 116.37296,
     netWorkList: [],
     zoomLevel: 15,
@@ -43,16 +47,60 @@ class HomeScreen extends React.Component{
     useCarInfo: {},
     psw: '',
     visible: false,
+    showTips: false,
+    usingCarInfo: {},
   }
   marker = [];
   openDrawer = () => {
     this.props.navigation.openDrawer();
   }
   componentDidMount() {
-    this.props.navigation.closeDrawer();
+    this.focusListener = this.props.navigation.addListener("didFocus", async () => {
+      this.getPosition();
+      this.props.navigation.closeDrawer();
+      let userInfo = await getAuth();
+      this.context.actions.getUserInfo(userInfo.token);
+      this.checkUseCar();
+    })
   }
-  componentWillMount() {
-    this.getPosition();
+  checkUseCar() {
+    api('/api/dsOrder/inUseOrder', {}).then(res => {
+      console.log(res);
+      if (res.data && res.data.success) {
+        this.setState({
+          showTips: true,
+          usingCarInfo: res.data.data,
+        })
+      } else {
+        this.setState({
+          showTips: false,
+          usingCarInfo: {},
+        })
+      }
+    })
+  }
+  // 按钮-导航 (外部地图导航-高德)
+  gotoNavi() {
+    const { lat, lng, useCarInfo } = this.state
+    const link = Platform.OS === 'ios' ? `iosamap://path?sourceApplication=quantum&sid=BGVIS1&slat=${lat}&slon=${lng}&sname=我的位置&did=BGVIS2&dlat=${useCarInfo.dsCarInfo.latitude}&dlon=${useCarInfo.dsCarInfo.longitude}&dname=车&dev=0&t=2`
+    : `androidamap://route?sourceApplication=quantum&slat=${lat}&slon=${lng}&dlat=${useCarInfo.dsCarInfo.latitude}&dlon=${useCarInfo.dsCarInfo.longitude}&sname=我的位置&dname=车&dev=0&m=0&t=2`;
+    if (Platform.OS === 'ios') {
+      Linking.openURL(link).then(() => { }).catch(() => {
+        Toast.show('请安装高德地图或版本不兼容');
+      });
+    } else {
+      Linking.canOpenURL(link).then((supported) => {
+        if (supported) {
+          Linking.openURL(link);
+        } else {
+          Toast.show('请安装高德地图或版本不兼容');
+        }
+      });
+    }
+  };
+  componentWillUnmount() {
+    // Remove the event listener
+    this.focusListener && this.focusListener.remove();
   }
   getCars(coor) {
     post('/app/dsCarNetwork/getNetWork', {
@@ -69,6 +117,7 @@ class HomeScreen extends React.Component{
   }
   getPosition() {
     navigator.geolocation.watchPosition((a) => {
+      console.log(a);
       this.setState({
         lat: a.coords.latitude,
         lng: a.coords.longitude,
@@ -78,6 +127,7 @@ class HomeScreen extends React.Component{
         lng: a.coords.longitude,
       })
     }, (b) => {
+      console.log(b);
     }, {
       enableHighAccuracy: true,
       maximumAge: 5000,
@@ -244,12 +294,13 @@ class HomeScreen extends React.Component{
         Toast.show('操作成功');
       } else {
         Toast.show(res.data && res.data.msg || '操作失败');
+        this.gotoNavi()
       }
     })
   }
 
   carPosition() {
-    Toast.show('开发中');
+    this.gotoNavi()
   }
 
   showPsw() {
@@ -283,7 +334,7 @@ class HomeScreen extends React.Component{
       useCarInfo: {},
       psw: '',
       visible: false,
-    })
+    }, this.checkUseCar);
   }
 
   load = (index) => {
@@ -292,14 +343,7 @@ class HomeScreen extends React.Component{
   }
 
   render() {
-    const coordinate = this.props && this.props.position && this.props.position.lat ? {
-      latitude: this.props.position.lat,
-      longitude: this.props.position.lng,
-    } : {
-      latitude: this.state.lat,
-      longitude: this.state.lng
-    }
-    const { carList, netWorkList, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible, lat, lng } = this.state
+    const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible, lat, lng } = this.state
     return (
       <View style={styles.container}>
        <View style={styles.header}>
@@ -309,21 +353,24 @@ class HomeScreen extends React.Component{
         </View>
           <MapView
             ref="map"
+            locationEnabled
+            onLocation={({ nativeEvent }) => {
+              console.log(`${nativeEvent.latitude}, ${nativeEvent.longitude}`)
+              this.setState({
+                lat: nativeEvent.latitude,
+                lng: nativeEvent.longitude,
+                firstLat: firstLat ? firstLat : nativeEvent.latitude,
+                firstLng: firstLng ? firstLng : nativeEvent.longitude,
+              })
+            }}
             showsLocationButton = {true}
             rotateEnabled = {false}
             showsZoomControls = {true}
             zoomLevel = {15}
-            style={{ height: '100%', height: '100%', backgroundColor: 'red', zIndex: 1 }}
-            coordinate={{"latitude": lat,
-            "longitude": lng}}
+            style={{ position: 'absolute', top: p(40), bottom: 0, left: 0, right: 0, zIndex: 1 }}
+            coordinate={{ latitude: Number(firstLat), longitude: Number(firstLng) }}
             onStatusChangeComplete={this._logStatusChangeCompleteEvent}
           >
-            <Marker coordinate={{"latitude": lat,
-            "longitude": lng}} icon={() => (
-                <Image source={IMAGES.pin} style={{ width: p(22), height: p(33) }}>
-                </Image>
-            )}>
-            </Marker>
             {netWorkList && netWorkList.length > 0 ? netWorkList.map((item, index) => 
               <Marker ref={ref => this.marker[index] = ref} onPress={this.netWorkPress.bind(this, item)} coordinate={{latitude: Number(item.latitude), longitude: Number(item.longitude)}} key={item.id} icon={() => (
                   <TouchableOpacity><ImageBackground onLoadEnd={this.load.bind(this, index)} source={IMAGES.map} style={{ width: p(36), height: p(36), alignItems: 'center', justifyContent: 'center' }}>
@@ -334,7 +381,7 @@ class HomeScreen extends React.Component{
             </Marker>
             ) : null}
             </MapView>
-        {showCarList ? <View style={styles.mask}>
+        {showCarList ? <Mask onPress={this.clear.bind(this)}>
           <ScrollView style={styles.carList}>
             {carList.map(item =>
             <TouchableOpacity style={styles.car} key={item.dsCar.carId} onPress={this.carPress.bind(this, item)}>
@@ -347,8 +394,8 @@ class HomeScreen extends React.Component{
                   </View>
                   <View style={styles.row}>
                     <Text style={styles.number}>{item.dsCar && item.dsCar.carId}  </Text>
-                    <Image source={IMAGES.oil} style={styles.oil}/>
-                    <Text style={styles.number}>{item.dsCar && item.dsCar.carInfoList && item.dsCar.carInfoList[0] && item.dsCar.carInfoList[0].soc}L  </Text>
+                    {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
+                    <Text style={styles.number}>剩余续航{item.dsCar && item.dsCar.extensionMileage}km  </Text>
                   </View>
                 </View>
                 <Image source={IMAGES.right} style={styles.right}/>
@@ -363,20 +410,20 @@ class HomeScreen extends React.Component{
               </View>
             </TouchableOpacity>)}
           </ScrollView>
-          <TouchableOpacity style={styles.closeOpacity} onPress={() => { this.setState({ showCarList: false }); }}>
+          {/* <TouchableOpacity style={styles.closeOpacity} onPress={() => { this.setState({ showCarList: false }); }}>
             <Image style={styles.close} source={IMAGES.close}></Image>
-          </TouchableOpacity>
-        </View> : null}
-        {showCar ? <View style={styles.mask}>
-          <View style={styles.carInfo}>
-          <TouchableOpacity style={styles.clearOpacity} onPress={this.clear.bind(this)}><Image source={IMAGES.clear} style={styles.clear} onPress={this.clear.bind(this)}/></TouchableOpacity>
+          </TouchableOpacity> */}
+        </Mask> : null}
+        {showCar ? <Mask onPress={this.clear.bind(this)}>
+          <TouchableOpacity activeOpacity={1} style={styles.carInfo}>
+          {/* <TouchableOpacity style={styles.clearOpacity} onPress={this.clear.bind(this)}><Image source={IMAGES.clear} style={styles.clear} onPress={this.clear.bind(this)}/></TouchableOpacity> */}
             <Image source={{ uri: `${host}${carInfo.dsCar && carInfo.dsCar.photo}`}} style={styles.detailImage}/>
             <View style={styles.textView1}>
               <Text style={styles.name}>{carInfo.dsCarType && carInfo.dsCarType.name}   {carInfo.dsCarType && carInfo.dsCarType.seat}座  </Text>
               <View style={styles.row}>
                 <Text style={styles.number}>{carInfo.dsCar && carInfo.dsCar.carId}  </Text>
-                <Image source={IMAGES.oil} style={styles.oil}/>
-                <Text style={styles.number}>{carInfo.dsCar && carInfo.dsCar.carInfoList && carInfo.dsCar.carInfoList[0] && carInfo.dsCar.carInfoList[0].soc}L  最大续航{carInfo.dsCarType.maxMileageEndurance}公里</Text>
+                {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
+                <Text style={styles.number}>剩余续航{carInfo.dsCar && carInfo.dsCar.extensionMileage}km  最大续航{carInfo.dsCarType.maxMileageEndurance}公里</Text>
               </View>
             </View>
             <View style={[styles.row, styles.margin20]}>
@@ -405,18 +452,18 @@ class HomeScreen extends React.Component{
                 <Text style={styles.passText}>确认订单</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View> : null}
-        {showUseCar ? <View style={styles.mask}>
-          <View style={[styles.carInfo, styles.carInfo1]}>
-            <TouchableOpacity style={styles.clearOpacity} onPress={this.clear.bind(this)}><Image source={IMAGES.clear} style={styles.clear} onPress={this.clear.bind(this)}/></TouchableOpacity>
+          </TouchableOpacity>
+        </Mask> : null}
+        {showUseCar ? <Mask onPress={this.clear.bind(this)}>
+          <TouchableOpacity activeOpacity={1} style={[styles.carInfo, styles.carInfo1]}>
+            {/* <TouchableOpacity style={styles.clearOpacity} onPress={this.clear.bind(this)}><Image source={IMAGES.clear} style={styles.clear} onPress={this.clear.bind(this)}/></TouchableOpacity> */}
             <Image source={{ uri: `${host}${useCarInfo.dsCar && useCarInfo.dsCar.photo}`}} style={styles.detailImage}/>
             <View style={styles.textView1}>
               <Text style={styles.name}>{useCarInfo.dsCarType && useCarInfo.dsCarType.name}   {useCarInfo.dsCarType && useCarInfo.dsCarType.seat}座  </Text>
               <View style={styles.row}>
                 <Text style={styles.number}>{useCarInfo.dsCar && useCarInfo.dsCar.carId}  </Text>
-                <Image source={IMAGES.oil} style={styles.oil}/>
-                <Text style={styles.number}>{useCarInfo.dsCar && useCarInfo.dsCar.carInfoList && useCarInfo.dsCar.carInfoList[0] && useCarInfo.dsCar.carInfoList[0].soc}L  最大续航{useCarInfo.dsCarType.maxMileageEndurance}公里</Text>
+                {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
+                <Text style={styles.number}>剩余续航{useCarInfo.dsCar && useCarInfo.dsCar.extensionMileage}km  最大续航{useCarInfo.dsCarType.maxMileageEndurance}km</Text>
               </View>
             </View>
             <View style={[styles.row, styles.margin20, styles.margin30]}>
@@ -440,7 +487,7 @@ class HomeScreen extends React.Component{
                 <Text style={styles.number}>订单总价： </Text>
                 <Text style={styles.priceNum}>0元</Text>
               </View>
-              <Text style={styles.number}>订单开始时间:  {format(useCarInfo.startTime, 'YYYY/MM/DD HH:mm:ss')}</Text>
+              <Text style={styles.number}>订单开始时间:  {useCarInfo.startTime ? format(useCarInfo.startTime, 'YYYY/MM/DD HH:mm:ss') : useCarInfo.returnStartTime}</Text>
             </View>
             <View style={styles.buttons}>
               <TouchableOpacity style={[styles.button1, styles.blue]} onPress={this.op.bind(this, 7)}>
@@ -467,9 +514,14 @@ class HomeScreen extends React.Component{
                 <Text style={styles.blueText}>刷新密码</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View> : null}
-       
+          </TouchableOpacity>
+        </Mask> : null}
+        {showTips ? <TouchableOpacity style={styles.tips} onPress={() => {
+          this.setState({
+            useCarInfo: usingCarInfo,
+            showUseCar: true,
+          })
+        }}><Text>您有行程中的订单，点击查看</Text></TouchableOpacity> : null}
         <Modal visible={visible} onPress={() => {this.setState({visible: false})}}>
           <Text>最新密码为{psw || useCarInfo.password}</Text>
         </Modal>
@@ -486,7 +538,7 @@ const styles = StyleSheet.create({
   },
   header: {
     height: p(40),
-    zIndex: 9,
+    zIndex: 2,
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     width: '100%',
   },
@@ -507,7 +559,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex:99,
+    zIndex:3,
   },
   carList: {
     position: 'absolute',
@@ -517,7 +569,7 @@ const styles = StyleSheet.create({
     height: p(325),
     left: 0,
     right: 0,
-    zIndex: 999,
+    zIndex: 4,
   },
   car: {
     marginBottom: p(10),
@@ -530,7 +582,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: p(500),
     left: p(177.5),
-    zIndex: 999,
+    zIndex: 4,
     borderRadius: p(10),
     overflow: 'hidden',
   },
@@ -581,7 +633,7 @@ const styles = StyleSheet.create({
     height: p(20),
     width: p(10),
     alignSelf: 'center',
-    marginLeft: p(30),
+    marginLeft: p(10),
   },
   fee: {
     fontSize: p(13),
@@ -618,7 +670,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -p(10),
     top: -p(10),
-    zIndex: 9999,
+    zIndex: 5,
     backgroundColor: '#fff',
     borderRadius: p(20),
     
@@ -724,6 +776,17 @@ const styles = StyleSheet.create({
     padding: p(20),
     backgroundColor: '#f2f2f2',
   },
+  tips: {
+    position: 'absolute',
+    top: p(50),
+    zIndex: 10,
+    left: p(10),
+    padding: p(5),
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: p(20),
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  }
 })
 
 export default connect(state => ({

@@ -3,6 +3,7 @@ package com.demo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.theweflex.react.WeChatPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.henninghall.date_picker.DatePickerPackage;
@@ -31,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new WeChatPackage(),
             new BackgroundTimerPackage(),
             new VectorIconsPackage(),
             new DatePickerPackage(),

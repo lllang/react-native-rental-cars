@@ -5,6 +5,7 @@ import Toast from 'react-native-simple-toast'
 import { getAuth } from '../utils/storage'
 import PropTypes from 'prop-types'
 import { post } from '../utils/request'
+import { registerApp } from 'react-native-wechat';
 
 export default class InitialScreen extends React.Component{
   static contextTypes = {
@@ -14,6 +15,7 @@ export default class InitialScreen extends React.Component{
     header: null
   }
   async componentDidMount () {
+    // registerApp('111111111111111');
     if (Platform.OS === 'android') {
       const result = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,

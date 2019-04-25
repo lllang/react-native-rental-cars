@@ -30,3 +30,7 @@
 
 1. 身份证提交的时候服务端需要做身份证校验
 2. 图片上传的时候不要直接入库了，等提交之后再入库
+
+curl 'https://www.dschuxing.com/app/dsCarNetworkUse/getNetCar' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: zh-CN' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) ReactNativeDebugger/0.9.7 Chrome/58.0.3029.110 Electron/1.7.15 Safari/537.36' -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/json, text/plain, */*' -H 'Connection: keep-alive' -H 'X-DevTools-Request-Id: 90078.1173' --data-binary '{"networkId":"065c1b018b3e46c7b0f41e20736df3a4"}' --compressed
+
+/api/dsUserInfo/info 接口没有增加驾驶证附页和驾驶证编号的枚举，增加 key copy_driver_license_url ，copy_driver_license_id

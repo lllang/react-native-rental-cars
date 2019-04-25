@@ -31,11 +31,11 @@ export default class OrderScreen extends React.Component{
     pn: 1,
     refreshState: RefreshState.Idle,
     hasNext: true,
-    state: 1,
+    status: 1,
   }
   search = () => {
-    const { pn, ps, state } = this.state;
-    api('/api/dsOrder/myOrder', { size: this.state.ps, page: this.state.pn, state }).then((res) => {
+    const { pn, ps, status } = this.state;
+    api('/api/dsOrder/myOrder', { size: ps, page: pn, state: status }).then((res) => {
       if (res.data && res.data.data && res.data.data.rows) {
         const list = pn === 1 ? res.data.data.rows : this.state.list.concat(res.data.data.rows);
         // const list = [
@@ -98,7 +98,7 @@ export default class OrderScreen extends React.Component{
         <View style={{ justifyContent: 'center' }}>
         <View style={styles.itemTop}>
           <Text style={styles.type}>车牌{item.dsCar && item.dsCar.carId}</Text>
-          <View style={[styles.numView, {backgroundColor: colors[item.type]}]}><Text style={[styles.num]}>{tabs[item.type].name}</Text></View>
+          <View style={[styles.numView, {backgroundColor: colors[item.type]}]}><Text style={[styles.num]}>{tabs[item.type] && tabs[item.type].name || ''}</Text></View>
         </View>
         <Text style={styles.time}>开始时间：{format(item.returnStartTime, 'YYYY/MM/DD HH:mm:ss')}</Text>
         </View>
@@ -111,7 +111,7 @@ export default class OrderScreen extends React.Component{
       hasNext,
       ps,
       refreshState,
-      state
+      status
     } = this.state;
     console.log(list)
     return (
@@ -119,9 +119,9 @@ export default class OrderScreen extends React.Component{
         <View style={styles.tabs}>
           {tabs.map((item) =>
             <TouchableOpacity
-              onPress={() => { this.setState({ state: item.value, pn: 1 }, this.search); }}
+              onPress={() => { this.setState({ status: item.value, pn: 1 }, this.search); }}
               key={item.value}
-              style={item.value === state ? [styles.tab, styles.active] : styles.tab}>
+              style={item.value === status ? [styles.tab, styles.active] : styles.tab}>
               <Text style={styles.tabText}>{item.name}</Text>
             </TouchableOpacity>)}
         </View>

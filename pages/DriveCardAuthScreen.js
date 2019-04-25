@@ -24,13 +24,15 @@ class DriveCardAuthScreen extends React.Component{
     code: this.cardInfo.find(i => i.key === 'driver_license_id') && this.cardInfo.find(i => i.key === 'driver_license_id').value || '',
     driverFile: this.cardInfo.find(i => i.key === 'driver_license_url') && this.cardInfo.find(i => i.key === 'driver_license_url').value
     ? `${host}${this.cardInfo.find(i => i.key === 'driver_license_url').value}` : '',
-    front: '',
+    copyDriverLicenseUrl: this.cardInfo.find(i => i.key === 'copy_driver_license_url') && this.cardInfo.find(i => i.key === 'copy_driver_license_url').value
+    ? `${host}${this.cardInfo.find(i => i.key === 'copy_driver_license_url').value}` : '',
+    fileNumber: this.cardInfo.find(i => i.key === 'copy_driver_license_id') && this.cardInfo.find(i => i.key === 'copy_driver_license_id').value || '',
     driverLicenseStartTime: this.cardInfo.find(i => i.key === 'driver_license_start_time') && this.cardInfo.find(i => i.key === 'driver_license_start_time').value || '',
     driverLicenseEndTime: this.cardInfo.find(i => i.key === 'driver_license_end_time') && this.cardInfo.find(i => i.key === 'driver_license_end_time').value || '',
   }
   submit = () => {
-    const { code, front, driverLicenseStartTime, driverLicenseEndTime, driverFile } = this.state;
-    if (!code || !driverFile || !driverLicenseStartTime || !driverLicenseEndTime) {
+    const { code, driverLicenseStartTime, driverLicenseEndTime, driverFile, fileNumber, copyDriverLicenseUrl } = this.state;
+    if (!code || !driverFile || !driverLicenseStartTime || !driverLicenseEndTime || !fileNumber || !copyDriverLicenseUrl) {
       Toast.show('请填写完整信息');
     }
     if (!/[0-9a-zA-Z]/g.test(code)) {
@@ -40,6 +42,8 @@ class DriveCardAuthScreen extends React.Component{
       driverLicenseId: code,
       driverLicenseEndTime,
       driverLicenseStartTime,
+      copyDriverLicenseUrl,
+      fileNumber,
       driverLicenseUrl: driverFile,
     }).then(res => {
       if (res.data.success) {
@@ -68,7 +72,7 @@ class DriveCardAuthScreen extends React.Component{
       console.log(res);
     })
   }
-  onPickPhotoClicked = () => {
+  onPickPhotoClicked = (type) => {
     const options = {
       title: '选择照片',
       maxWidth: 1024,
@@ -91,33 +95,43 @@ class DriveCardAuthScreen extends React.Component{
     };
     ImagePicker.showImagePicker(options, (response) => {
       if (response.data) {
-        api('/api/dsUserInfo/addPhoto', {imgUrl: `data:image/jpeg;base64,${response.data}`, imgType: 'driverFile'}).then(res => {
+        api('/api/dsUserInfo/addPhoto', {imgUrl: `data:image/jpeg;base64,${response.data}`, imgType: type}).then(res => {
           console.log(res);
-          this.setState({
-            driverFile: `data:image/jpeg;base64,${response.data}`,
-            front: res.data.data
-          });
+          if (type === 'copyDriverLicenseUrl') {
+            this.setState({
+              copyDriverLicenseUrl: `data:image/jpeg;base64,${response.data}`,
+            });
+          } else {
+            this.setState({
+              driverFile: `data:image/jpeg;base64,${response.data}`,
+            });
+          }
         })
       }
     });
   };
   render() {
-    const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code } = this.state;
+    const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code, copyDriverLicenseUrl } = this.state;
     return (
       <View style={styles.container}>
       <ScrollView>
       <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
         <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
+        <TextInput style={styles.input1} placeholder='请输入档案编号' value={fileNumber} onChangeText={(value) => { this.setState({ fileNumber: value }) }}/>
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this, 'driverLicenseStartTime')}>
-          <Text style={styles.date}>{driverLicenseStartTime || '请选择开始时间'}</Text>
+          <Text style={styles.date}>{driverLicenseStartTime || '有效期开始时间'}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this, 'driverLicenseEndTime')}>
-          <Text style={styles.date}>{driverLicenseEndTime || '请选择开始时间'}</Text>
+          <Text style={styles.date}>{driverLicenseEndTime || '有效期结束时间'}</Text>
         </TouchableOpacity>
       </View>
         <Text style={styles.text}>驾驶证照片</Text>
-        <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this)}>
+        <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'driverFile')}>
           <Image source={driverFile ? {uri: driverFile} : IMAGES.front} style={styles.image}/>
+        </TouchableOpacity>
+        <Text style={styles.text}>驾驶证照片</Text>
+        <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'copyDriverLicenseUrl')}>
+          <Image source={copyDriverLicenseUrl ? {uri: copyDriverLicenseUrl} : IMAGES.front} style={styles.image}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>

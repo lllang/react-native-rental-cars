@@ -30,6 +30,13 @@ class LeftDrawer extends React.Component{
   }
   componentDidMount() {
     console.log(this.props);
+    this.focusListener = this.props.navigation.addListener("didFocus", () => {
+      actions.getUserInfo();
+    })
+  }
+  componentWillUnmount() {
+    // Remove the event listener
+    this.focusListener && this.focusListener.remove();
   }
   jump = (route) => {
     this.props.navigation.navigate(route);
@@ -41,11 +48,11 @@ class LeftDrawer extends React.Component{
         <Image source={IMAGES.back} style={styles.back}/>
         <Text style={styles.phone}>{userInfo && userInfo.name || ''}</Text>
         <TouchableOpacity style={styles.vip}>
-          <TouchableOpacity style={[styles.vipOpacity, userInfo && !userInfo.isUserCar && !userInfo.partner ? {} : styles.disabledVipOpacity]}>
-            <Text style={[styles.vipText, userInfo && !userInfo.isUserCar && !userInfo.partner ? {} : styles.disabledVipText]}>普通会员</Text>
+          <TouchableOpacity style={[styles.vipOpacity]}>
+            <Text style={[styles.vipText]}>共享用户</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.vipOpacity, userInfo && userInfo.isUserCar ? {} : styles.disabledVipOpacity]}>
-            <Text style={[styles.vipText, userInfo && userInfo.isUserCar ? {} : styles.disabledVipText]}>车主会员</Text>
+            <Text style={[styles.vipText, userInfo && userInfo.isUserCar ? {} : styles.disabledVipText]}>共享车主</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.vipOpacity, userInfo && userInfo.partner ? {} : styles.disabledVipOpacity]}>
             <Text style={[styles.vipText, userInfo && userInfo.partner ? {} : styles.disabledVipText]}>城市合伙人</Text>
@@ -108,7 +115,7 @@ const styles = StyleSheet.create({
   },
   vipText: {
     color: '#2b2b2b',
-    fontSize: p(15),
+    fontSize: p(12),
   },
   disabledVipText: {
     color: '#c9c9c9',
@@ -116,7 +123,7 @@ const styles = StyleSheet.create({
   vipOpacity: {
     borderWidth: 1,
     borderColor: '#1c1c1c',
-    padding: p(12),
+    padding: p(5),
     paddingTop: p(4),
     paddingBottom: p(4),
     borderRadius: p(11),

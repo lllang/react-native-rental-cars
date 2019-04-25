@@ -22,8 +22,6 @@ class CardAuthScreen extends React.Component{
   cardInfo = this.props.navigation.getParam('cardInfo', [])
   state = {
     code: this.cardInfo.find(i => i.key === 'card_id') && this.cardInfo.find(i => i.key === 'card_id').value || '',
-    handleFile: '',
-    backFile: '',
     front: this.cardInfo.find(i => i.key === 'card_front_url') && this.cardInfo.find(i => i.key === 'card_front_url').value
     ? `${host}${this.cardInfo.find(i => i.key === 'card_front_url').value}` : '',
     end: this.cardInfo.find(i => i.key === 'card_back_url') && this.cardInfo.find(i => i.key === 'card_back_url').value
@@ -91,25 +89,14 @@ class CardAuthScreen extends React.Component{
     };
     ImagePicker.showImagePicker(options, (response) => {
       if (response.data) {
-        // if (type === 'handleFile') {
-        //   this.setState({
-        //     handleFile: `data:image/jpeg;base64,${response.data}`,
-        //   });
-        // } else {
-        //   this.setState({
-        //     backFile: `data:image/jpeg;base64,${response.data}`,
-        //   })
-        // }
         api('/api/dsUserInfo/addPhoto', {imgUrl: `data:image/jpeg;base64,${response.data}`, imgType: type}).then(res => {
           console.log(res);
           if (type === 'handleFile') {
             this.setState({
-              handleFile: `data:image/jpeg;base64,${response.data}`,
               front: `${host}${res.data.data}`
             });
           } else {
             this.setState({
-              backFile: `data:image/jpeg;base64,${response.data}`,
               end: `${host}${res.data.data}`
             })
           }

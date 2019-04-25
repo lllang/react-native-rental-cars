@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { appReducer, updatePosition, updateUserInfo } from './app';
+import { appReducer, updatePosition, updateUserInfo, getUserInfo } from './app';
 
 export const reducers = combineReducers({
   app: appReducer
@@ -7,4 +7,5 @@ export const reducers = combineReducers({
 export const actions = {
   updatePosition,
   updateUserInfo,
+  getUserInfo,
 };

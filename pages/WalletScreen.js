@@ -2,7 +2,9 @@ import React from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native'
 import Toast from 'react-native-simple-toast';
 import { connect } from 'react-redux';
-import { p } from '../utils/resolutions'
+import { p } from '../utils/resolutions';
+import { api } from '../utils/request';
+import { pay } from 'react-native-wechat';
 
 const IMAGES = {
   check: require('../assets/wallet/icon-check.png'),
@@ -19,13 +21,29 @@ class WalletScreen extends React.Component{
     rechargeArray: [50, 100, 200, 300, 500, 1000],
     checked: false,
     show: true,
+    payNum: '',
     recharge: 0,
     payType: 'wechat',
   }
   submit = () => {
-    if(!this.state.checked) {
+    const { checked, payType, recharge, show, payNum } = this.state;
+    if(!checked) {
       Toast.show('请选勾选协议');
       return;
+    }
+    if (payType === 'wechat') {
+      api('/api/pay/rechargePrePayInfo', {
+        num: show ? payNum : recharge
+      }).then(async (res) => {
+        if(res.data && res.data.success) {
+          const result = await pay({
+            appId: '1111111111',
+          });
+          console.log(result);
+        } else {
+          console.log(res);
+        }
+      })
     }
   }
   render() {
@@ -69,7 +87,11 @@ class WalletScreen extends React.Component{
           }}>
             <Text style={show ? styles.rechargeNum : styles.disabledText}>自定义</Text>
           </TouchableOpacity>
-          {show ? <TextInput placeholder="请输入自定义金额" type="numeric" style={styles.input}></TextInput> : null}
+          {show ? <TextInput placeholder="请输入自定义金额" type="numeric" style={styles.input} onChangeText={(value) => {
+            this.setState({
+              payNum: value
+            })
+          }}></TextInput> : null}
         </View>
         <View style={styles.recharge}>
           <TouchableOpacity style={styles.rechargeItem} onPress={() => {
