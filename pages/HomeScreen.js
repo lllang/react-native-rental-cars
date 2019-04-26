@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, Modal, Linking, Platform } from 'react-native'
-import { MapView, Marker } from 'react-native-amap3d'
+import { MapView, Marker, Polygon } from 'react-native-amap3d'
 import { p } from '../utils/resolutions'
 import PropTypes from 'prop-types'
 import { getAuth } from '../utils/storage'
@@ -8,6 +8,7 @@ import { post, api } from '../utils/request'
 import Picker from '../components/Picker';
 import Mask from '../components/Mask';
 import host from '../utils/config'
+import { SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux'
 import Toast from 'react-native-simple-toast'
 import format from 'date-fns/format';
@@ -55,9 +56,9 @@ class HomeScreen extends React.Component{
     this.props.navigation.openDrawer();
   }
   componentDidMount() {
+    this.props.navigation.closeDrawer();
     this.focusListener = this.props.navigation.addListener("didFocus", async () => {
       this.getPosition();
-      this.props.navigation.closeDrawer();
       let userInfo = await getAuth();
       this.context.actions.getUserInfo(userInfo.token);
       this.checkUseCar();
@@ -265,7 +266,7 @@ class HomeScreen extends React.Component{
       if(res.data && res.data.success) {
         Toast.show(type === 7 ? '开门成功' : '关门成功');
       } else {
-        Toast.show(res.data && res.data.msg || type === 7 ? '开门失败' : '关门失败');
+        Toast.show(res.data && res.data.msg || (type === 7 ? '开门失败' : '关门失败'));
       }
     })
   }
@@ -276,6 +277,8 @@ class HomeScreen extends React.Component{
     }).then(res => {
       if(res.data && res.data.success) {
         Toast.show('还车成功');
+        this.clear();
+        this.props.navigation.push('order', { status: 2 });
       } else {
         Toast.show(res.data && res.data.msg || '还车失败');
         this.props.navigation.push('orderDetail', { id: this.state.useCarInfo.id })
@@ -343,9 +346,9 @@ class HomeScreen extends React.Component{
   }
 
   render() {
-    const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible, lat, lng } = this.state
+    const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible } = this.state
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
        <View style={styles.header}>
           <TouchableOpacity style={styles.iconUserOpacity} onPress={this.openDrawer}>
             <Image source={IMAGES.user} style={styles.iconUser}/>
@@ -379,6 +382,9 @@ class HomeScreen extends React.Component{
               )}>
               <View></View>
             </Marker>
+            ) : null}
+            {netWorkList && netWorkList.length > 0 ? netWorkList.map((item, index) => 
+              <Polygon key={index} coordinates={item.apiNetWorkPointList.map(i => ({latitude: Number(i.latitude), longitude: Number(i.longitude)}))} strokeWidth={3} strokeColor="#999" fillColor="transparent"/>
             ) : null}
             </MapView>
         {showCarList ? <Mask onPress={this.clear.bind(this)}>
@@ -423,7 +429,7 @@ class HomeScreen extends React.Component{
               <View style={styles.row}>
                 <Text style={styles.number}>{carInfo.dsCar && carInfo.dsCar.carId}  </Text>
                 {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
-                <Text style={styles.number}>剩余续航{carInfo.dsCar && carInfo.dsCar.extensionMileage}km  最大续航{carInfo.dsCarType.maxMileageEndurance}公里</Text>
+                <Text style={styles.number}>剩余续航{carInfo.dsCar && carInfo.dsCar.extensionMileage}km  最大续航{carInfo.dsCarType.maxMileageEndurance}km</Text>
               </View>
             </View>
             <View style={[styles.row, styles.margin20]}>
@@ -473,6 +479,9 @@ class HomeScreen extends React.Component{
               <Text style={styles.fee}>车辆里程收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{useCarInfo.dsCarType.mileageCharge}</Text>
               <Text style={styles.fee}>元/公里</Text>
+            </View>
+            <View style={[styles.row, styles.margin20, styles.margin30]}>
+              <Text>当前车辆密码{psw || useCarInfo.password}</Text>
             </View>
             <TouchableOpacity style={[styles.point, styles.point1]}>
               <Text style={styles.getCar}>取车点：</Text>
@@ -526,7 +535,7 @@ class HomeScreen extends React.Component{
           <Text>最新密码为{psw || useCarInfo.password}</Text>
         </Modal>
         <Picker ref="picker" />
-      </View>
+      </SafeAreaView>
     )
   }
 }
@@ -719,7 +728,7 @@ const styles = StyleSheet.create({
     top: p(20),
   },
   buttons: {
-    marginTop: p(20),
+    marginTop: p(10),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',

@@ -87,7 +87,7 @@ class WalletScreen extends React.Component{
           }}>
             <Text style={show ? styles.rechargeNum : styles.disabledText}>自定义</Text>
           </TouchableOpacity>
-          {show ? <TextInput placeholder="请输入自定义金额" type="numeric" style={styles.input} onChangeText={(value) => {
+          {show ? <TextInput placeholder="请输入自定义金额" keyboardType="numeric" style={styles.input} onChangeText={(value) => {
             this.setState({
               payNum: value
             })

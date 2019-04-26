@@ -31,7 +31,7 @@ export default class OrderScreen extends React.Component{
     pn: 1,
     refreshState: RefreshState.Idle,
     hasNext: true,
-    status: 1,
+    status: this.props.navigation.getParam('status') || 1,
   }
   search = () => {
     const { pn, ps, status } = this.state;

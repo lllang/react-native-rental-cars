@@ -85,6 +85,19 @@ export default class OrderDetailScreen extends React.Component{
     })
   }
 
+  submit() {
+    api('/api/dsOrder/orderClosing', {
+      id: this.props.navigation.getParam('id', ''),
+    }).then(res => {
+      if(res.data && res.data.success) {
+        Toast.show('支付成功');
+        this.getOrder();
+      } else {
+        Toast.show(res.data && res.data.msg || '支付失败');
+      }
+    })
+  }
+
   render() {
     const { carInfo } = this.state;
     return (
@@ -137,7 +150,7 @@ export default class OrderDetailScreen extends React.Component{
             <Text style={styles.number}>订单当前状态</Text>
           </View>
         </View>
-        {carInfo.state == 2 ? <TouchableOpacity style={styles.submit} onPress={this.submit}>
+        {carInfo.state == 2 ? <TouchableOpacity style={styles.submit} onPress={this.submit.bind(this)}>
             <Text style={styles.submitText}>支付</Text>
           </TouchableOpacity> : null}
           {carInfo.state == 1 ? <TouchableOpacity style={styles.submit} onPress={this.endOrder.bind(this)}>

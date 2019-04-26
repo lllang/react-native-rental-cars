@@ -111,7 +111,7 @@ class DriveCardAuthScreen extends React.Component{
     });
   };
   render() {
-    const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code, copyDriverLicenseUrl } = this.state;
+    const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code, copyDriverLicenseUrl, fileNumber } = this.state;
     return (
       <View style={styles.container}>
       <ScrollView>

@@ -1,3 +1,5 @@
+18959803705
+
 1. 提交驾驶证日期入参格式，调整为字符串 '2019-04-15' 这种
 2. 单个照片的提交接口一直返回数据不合法，服务端是不是有什么校验。
 3. 身份认证的类型有哪些，入参是啥，我看接口写的 身份证 这种字符串，感觉不太对
@@ -34,3 +36,6 @@
 curl 'https://www.dschuxing.com/app/dsCarNetworkUse/getNetCar' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: zh-CN' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) ReactNativeDebugger/0.9.7 Chrome/58.0.3029.110 Electron/1.7.15 Safari/537.36' -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/json, text/plain, */*' -H 'Connection: keep-alive' -H 'X-DevTools-Request-Id: 90078.1173' --data-binary '{"networkId":"065c1b018b3e46c7b0f41e20736df3a4"}' --compressed
 
 /api/dsUserInfo/info 接口没有增加驾驶证附页和驾驶证编号的枚举，增加 key copy_driver_license_url ，copy_driver_license_id
+
+支付接口 /api/dsOrder/orderClosing 404，
+身份证认证那个问题是，提交接口调用成功之后，再调用获取用户信息接口 /api/dsUserInfo/info 返回的始终是空数组

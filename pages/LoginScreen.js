@@ -44,7 +44,7 @@ export default class LoginScrren extends Component{
     return (
       <View style={styles.container}>
         <Text style={styles.title}>欢迎您</Text>
-        <TextInput style={styles.input1} placeholder='请输入用户名' type='numeric' autoFocus onChangeText={(value) => { this.setState({ tel: value }) }}/>
+        <TextInput style={styles.input1} placeholder='请输入用户名' keyboardType='numeric' autoFocus onChangeText={(value) => { this.setState({ tel: value }) }}/>
         <TextInput style={[styles.input1, styles.input2]} secureTextEntry={true} placeholder='请输入密码' onChangeText={(value) => { this.setState({ password: value }) }}/>
         <TouchableOpacity style={styles.submit} onPress={this.login}>
           <Text style={styles.submitText}>登录</Text>
