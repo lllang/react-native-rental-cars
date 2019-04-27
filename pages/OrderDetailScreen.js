@@ -86,8 +86,9 @@ export default class OrderDetailScreen extends React.Component{
   }
 
   submit() {
-    api('/api/dsOrder/orderClosing', {
+    api('/api/dsOrder/payOrder', {
       id: this.props.navigation.getParam('id', ''),
+      payType: 3,
     }).then(res => {
       if(res.data && res.data.success) {
         Toast.show('支付成功');

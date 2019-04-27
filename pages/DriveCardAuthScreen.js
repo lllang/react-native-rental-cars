@@ -26,7 +26,7 @@ class DriveCardAuthScreen extends React.Component{
     ? `${host}${this.cardInfo.find(i => i.key === 'driver_license_url').value}` : '',
     copyDriverLicenseUrl: this.cardInfo.find(i => i.key === 'copy_driver_license_url') && this.cardInfo.find(i => i.key === 'copy_driver_license_url').value
     ? `${host}${this.cardInfo.find(i => i.key === 'copy_driver_license_url').value}` : '',
-    fileNumber: this.cardInfo.find(i => i.key === 'copy_driver_license_id') && this.cardInfo.find(i => i.key === 'copy_driver_license_id').value || '',
+    fileNumber: this.cardInfo.find(i => i.key === 'file_number') && this.cardInfo.find(i => i.key === 'file_number').value || '',
     driverLicenseStartTime: this.cardInfo.find(i => i.key === 'driver_license_start_time') && this.cardInfo.find(i => i.key === 'driver_license_start_time').value || '',
     driverLicenseEndTime: this.cardInfo.find(i => i.key === 'driver_license_end_time') && this.cardInfo.find(i => i.key === 'driver_license_end_time').value || '',
   }
