@@ -4,7 +4,7 @@ import Toast from 'react-native-simple-toast';
 import { connect } from 'react-redux';
 import { p } from '../utils/resolutions';
 import { api } from '../utils/request';
-import { pay } from 'react-native-wechat';
+import Wxpay from '../utils/wxpay'
 
 const IMAGES = {
   check: require('../assets/wallet/icon-check.png'),
@@ -32,19 +32,58 @@ class WalletScreen extends React.Component{
       return;
     }
     if (payType === 'wechat') {
-      api('/api/pay/rechargePrePayInfo', {
-        num: show ? payNum : recharge
-      }).then(async (res) => {
-        if(res.data && res.data.success) {
-          const result = await pay({
-            appId: '1111111111',
-          });
-          console.log(result);
-        } else {
-          console.log(res);
-        }
+      // api('/api/pay/rechargePrePayInfo', {
+      //   num: show ? Number(payNum) : Number(recharge)
+      // }).then(async (res) => {
+      //   if(res.data && res.data.success) {
+      //     const result = await pay({
+      //       appId: '1111111111',
+      //     });
+      //     console.log(result);
+      //   } else {
+      //     console.log(res);
+      //   }
+      // })
+      this.wxPayAction({
+        appid: 'wx8888888888888888',
+        partnerId: '1230000109',
+        prepayid: 'WX1217752501201407033233368018',
+        nonceStr: '5K8264ILTKCH16CQ2502SI8ZNMTM67VS',
+        sign: 'C380BEC2BFD727A4B6845133519F3AD6',
+        timestamp: 1412000000,
+        // out_trade_no: '20150806125346',
+        // total_fee: 1,
+        // spbill_create_ip: '123.12.12.123',
+        // notify_url: 'http://www.weixin.qq.com/wxpay/pay.php',
+        // trade_type: 'APP'
       })
     }
+  }
+  async wxPayAction(wxDic){
+    //wxDic为从服务器获取的支付信息
+    Wxpay.isSupported().then((isSupported)=>{
+        if (isSupported) {
+          console.log('support');
+            Wxpay.pay(wxDic).then((data) =>{
+                console.log('data='+JSON.stringify(data));
+                //data = {"errCode":0}//支付成功
+                //data={"errCode":-2} //取消支付
+                if (data.errCode == 0){
+                  console.log('支付成功')
+                //支付成功
+                } else {
+                  console.log('支付失败')
+                //支付失败
+                }
+            });
+        }else {
+          console.log('未安装微信或当前微信版本较低')
+            //未安装微信或当前微信版本较低
+        }
+    }).catch((err) => {
+        console.log('err='+err);
+        Toast.show('支付失败');
+    });
   }
   render() {
     const { userInfo } = this.props

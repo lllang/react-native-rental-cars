@@ -3,7 +3,6 @@ package com.demo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.theweflex.react.WeChatPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.henninghall.date_picker.DatePickerPackage;
@@ -16,6 +15,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.demo.wxapi.WxpayPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new WeChatPackage(),
+            new WxpayPackage(), // <-- 注册模块
             new BackgroundTimerPackage(),
             new VectorIconsPackage(),
             new DatePickerPackage(),
