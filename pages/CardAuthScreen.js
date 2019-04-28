@@ -32,9 +32,11 @@ class CardAuthScreen extends React.Component{
     const { code, cardType, front, end } = this.state;
     if (!code || !end || !front || !cardType) {
       Toast.show('请填写完整信息');
+      return;
     }
     if (!/[0-9xX]/g.test(code)) {
       Toast.show('请检查证件号码');
+      return;
     }
     api('/api/dsUserInfo/saveUpdate', {
       cardId: this.state.code,

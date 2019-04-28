@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux'
 import Toast from 'react-native-simple-toast'
 import format from 'date-fns/format';
+import { Loading } from '../utils/loading';
 
 const IMAGES = {
   user: require('../assets/home/icon-user.png'),
@@ -49,6 +50,8 @@ class HomeScreen extends React.Component{
     psw: '',
     visible: false,
     showTips: false,
+    centerLat: '',
+    centerLng: '',
     usingCarInfo: {},
   }
   marker = [];
@@ -137,6 +140,10 @@ class HomeScreen extends React.Component{
     })
   }
   _logStatusChangeCompleteEvent = ({ nativeEvent }) => {
+    this.setState({
+      centerLat: nativeEvent.latitude,
+      centerLng: nativeEvent.longitude,
+    })
     this.getCars({
       lat: nativeEvent.latitude,
       lng: nativeEvent.longitude,
@@ -183,6 +190,7 @@ class HomeScreen extends React.Component{
       Toast.show('请先选择还车网点');
       return;
     }
+    Loading.show();
     api('/api/dsOrder/addOrder', {
       carId: item.dsCar.id,
       startNetworkId: this.state.startNetworkId,
@@ -190,6 +198,7 @@ class HomeScreen extends React.Component{
       state: 1,
     }).then(res => {
       if (res.data && res.data.success) {
+        Loading.hidden();
         Toast.show('用车成功');
         this.setState({
           showUseCar: true,
@@ -197,6 +206,7 @@ class HomeScreen extends React.Component{
           useCarInfo: res.data.data,
         })
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '用车失败');
       }
     })
@@ -259,33 +269,40 @@ class HomeScreen extends React.Component{
   }
 
   op(type) {
+    Loading.show();
     api('/api/dsCar/opCar', {
       id: this.state.useCarInfo.id,
       op: type
     }).then(res => {
       if(res.data && res.data.success) {
+        Loading.hidden();
         Toast.show(type === 7 ? '开门成功' : '关门成功');
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || (type === 7 ? '开门失败' : '关门失败'));
       }
     })
   }
 
   endOrder() {
+    Loading.show();
     api('/api/dsOrder/endOrder', {
       id: this.state.useCarInfo.id,
     }).then(res => {
       if(res.data && res.data.success) {
+        Loading.hidden();
         Toast.show('还车成功');
         this.clear();
         this.props.navigation.push('order', { status: 2 });
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '还车失败');
       }
     })
   }
 
   findCar() {
+    Loading.show();
     api('/api/dsCar/findCar', {
       carId: this.state.useCarInfo.dsCar.id,
       op: 3,
@@ -293,9 +310,11 @@ class HomeScreen extends React.Component{
       x: this.state.lng,
     }).then(res => {
       if(res.data && res.data.success) {
+        Loading.hidden();
         Toast.show('操作成功');
       } else {
         Toast.show(res.data && res.data.msg || '操作失败');
+        Loading.hidden();
         this.gotoNavi()
       }
     })
@@ -310,14 +329,17 @@ class HomeScreen extends React.Component{
   }
 
   refresh() {
+    Loading.show();
     api('/api/dsCar/refreshPaw', {
       carId: this.state.useCarInfo.dsCar.id,
     }).then(res => {
       if(res.data && res.data.success) {
+        Loading.hidden();
         this.setState({
           psw: res.data.data,
         }, this.showPsw)
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '操作失败');
       }
     })
@@ -338,7 +360,10 @@ class HomeScreen extends React.Component{
       visible: false,
     }, () => {
       this.checkUseCar();
-      this.getCars();
+      this.getCars({
+        lat: this.state.centerLat,
+        lng: this.state.centerLng,
+      });
     });
   }
 
@@ -788,7 +813,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: p(50),
     zIndex: 10,
-    left: p(10),
+    left: p(50),
     padding: p(5),
     borderWidth: 1,
     borderColor: '#999',

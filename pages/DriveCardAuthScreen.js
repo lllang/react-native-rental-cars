@@ -34,9 +34,11 @@ class DriveCardAuthScreen extends React.Component{
     const { code, driverLicenseStartTime, driverLicenseEndTime, driverFile, fileNumber, copyDriverLicenseUrl } = this.state;
     if (!code || !driverFile || !driverLicenseStartTime || !driverLicenseEndTime || !fileNumber || !copyDriverLicenseUrl) {
       Toast.show('请填写完整信息');
+      return;
     }
-    if (!/[0-9a-zA-Z]/g.test(code)) {
+    if (!/[0-9a-zA-Z]/g.test(code) || !/[0-9a-zA-Z]/g.test(fileNumber)) {
       Toast.show('请检查证件号码');
+      return;
     }
     api('/api/dsUserInfo/saveDriverUpdate', {
       driverLicenseId: code,
@@ -117,7 +119,7 @@ class DriveCardAuthScreen extends React.Component{
       <ScrollView>
       <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
         <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
-        <TextInput style={styles.input1} placeholder='请输入档案编号' value={fileNumber} onChangeText={(value) => { this.setState({ fileNumber: value }) }}/>
+        <TextInput style={styles.input1} placeholder='请输入档案编号' value={fileNumber} onChangeText={(value) => { this.setState({ fileNumber: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this, 'driverLicenseStartTime')}>
           <Text style={styles.date}>{driverLicenseStartTime || '有效期开始时间'}</Text>
         </TouchableOpacity>
