@@ -147,7 +147,7 @@ export default class OrderDetailScreen extends React.Component{
             <Text style={styles.number}>订单总价/元</Text>
           </View>
           <View style={styles.item}>
-            <Text style={[styles.time, styles.state]}>{['预约', '使用中', '待付款', '待到账', '已完成', '违章', '取消订单'][carInfo.state]}</Text>
+            <Text style={[styles.time, styles.state]}>{['预约', '使用中', '待付款', '待到账', '已完成', '违章', '取消订单', '违章待查询'][carInfo.state]}</Text>
             <Text style={styles.number}>订单当前状态</Text>
           </View>
         </View>

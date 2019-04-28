@@ -281,7 +281,6 @@ class HomeScreen extends React.Component{
         this.props.navigation.push('order', { status: 2 });
       } else {
         Toast.show(res.data && res.data.msg || '还车失败');
-        this.props.navigation.push('orderDetail', { id: this.state.useCarInfo.id })
       }
     })
   }
@@ -337,7 +336,10 @@ class HomeScreen extends React.Component{
       useCarInfo: {},
       psw: '',
       visible: false,
-    }, this.checkUseCar);
+    }, () => {
+      this.checkUseCar();
+      this.getCars();
+    });
   }
 
   load = (index) => {
@@ -481,7 +483,7 @@ class HomeScreen extends React.Component{
               <Text style={styles.fee}>元/公里</Text>
             </View>
             <View style={[styles.row, styles.margin20, styles.margin30]}>
-              <Text>当前车辆密码{psw || useCarInfo.password}</Text>
+              <Text style={{ color: '#df8889' }}>当前用车密码{psw || useCarInfo.password}#</Text>
             </View>
             <TouchableOpacity style={[styles.point, styles.point1]}>
               <Text style={styles.getCar}>取车点：</Text>
@@ -515,9 +517,6 @@ class HomeScreen extends React.Component{
             <View style={styles.buttons}>
             <TouchableOpacity style={[styles.button1, styles.blue]} onPress={this.carPosition.bind(this)}>
                 <Text style={styles.blueText}>车辆定位</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.button1, styles.blue]} onPress={this.showPsw.bind(this)}>
-                <Text style={styles.blueText}>显示密码</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.button1, styles.blue]} onPress={this.refresh.bind(this)}>
                 <Text style={styles.blueText}>刷新密码</Text>
