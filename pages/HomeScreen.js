@@ -337,7 +337,8 @@ class HomeScreen extends React.Component{
         Loading.hidden();
         this.setState({
           psw: res.data.data,
-        }, this.showPsw)
+        })
+        Toast.show('刷新成功，请在面板上查看最新密码')
       } else {
         Loading.hidden();
         Toast.show(res.data && res.data.msg || '操作失败');

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { p } from '../utils/resolutions'
 import { api } from '../utils/request';
 import host from '../utils/config';
+import { Loading } from '../utils/loading';
 import format from 'date-fns/format'
 
 const IMAGES = {
@@ -73,27 +74,33 @@ export default class OrderDetailScreen extends React.Component{
 
 
   endOrder() {
+    Loading.show();
     api('/api/dsOrder/endOrder', {
       id: this.props.navigation.getParam('id', ''),
     }).then(res => {
       if(res.data && res.data.success) {
+        Loading.hidden();
         Toast.show('还车成功');
         this.getOrder();
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '还车失败');
       }
     })
   }
 
   submit() {
+    Loading.show();
     api('/api/dsOrder/payOrder', {
       id: this.props.navigation.getParam('id', ''),
       payType: 3,
     }).then(res => {
       if(res.data && res.data.success) {
+        Loading.hidden();
         Toast.show('支付成功');
         this.getOrder();
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '支付失败');
       }
     })

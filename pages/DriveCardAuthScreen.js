@@ -23,12 +23,14 @@ class DriveCardAuthScreen extends React.Component{
   state = {
     code: this.cardInfo.find(i => i.key === 'driver_license_id') && this.cardInfo.find(i => i.key === 'driver_license_id').value || '',
     driverFile: this.cardInfo.find(i => i.key === 'driver_license_url') && this.cardInfo.find(i => i.key === 'driver_license_url').value
-    ? `${host}${this.cardInfo.find(i => i.key === 'driver_license_url').value}` : '',
+    ? `${this.cardInfo.find(i => i.key === 'driver_license_url').value}` : '',
     copyDriverLicenseUrl: this.cardInfo.find(i => i.key === 'copy_driver_license_url') && this.cardInfo.find(i => i.key === 'copy_driver_license_url').value
-    ? `${host}${this.cardInfo.find(i => i.key === 'copy_driver_license_url').value}` : '',
+    ? `${this.cardInfo.find(i => i.key === 'copy_driver_license_url').value}` : '',
     fileNumber: this.cardInfo.find(i => i.key === 'file_number') && this.cardInfo.find(i => i.key === 'file_number').value || '',
     driverLicenseStartTime: this.cardInfo.find(i => i.key === 'driver_license_start_time') && this.cardInfo.find(i => i.key === 'driver_license_start_time').value || '',
     driverLicenseEndTime: this.cardInfo.find(i => i.key === 'driver_license_end_time') && this.cardInfo.find(i => i.key === 'driver_license_end_time').value || '',
+    reason: this.cardInfo.find(i => i.key === 'driver_license_id') && this.cardInfo.find(i => i.key === 'driver_license_id').reason || '',
+    isAuthentication: this.cardInfo.find(i => i.key === 'driver_license_id') && this.cardInfo.find(i => i.key === 'driver_license_id').isAuthentication || 0,
   }
   submit = () => {
     const { code, driverLicenseStartTime, driverLicenseEndTime, driverFile, fileNumber, copyDriverLicenseUrl } = this.state;
@@ -101,11 +103,11 @@ class DriveCardAuthScreen extends React.Component{
           console.log(res);
           if (type === 'copyDriverLicenseUrl') {
             this.setState({
-              copyDriverLicenseUrl: `data:image/jpeg;base64,${response.data}`,
+              copyDriverLicenseUrl: `${res.data.data}`
             });
           } else {
             this.setState({
-              driverFile: `data:image/jpeg;base64,${response.data}`,
+              driverFile: `${res.data.data}`
             });
           }
         })
@@ -113,11 +115,12 @@ class DriveCardAuthScreen extends React.Component{
     });
   };
   render() {
-    const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code, copyDriverLicenseUrl, fileNumber } = this.state;
+    const { driverFile, driverLicenseStartTime, driverLicenseEndTime, code, copyDriverLicenseUrl, fileNumber, isAuthentication, reason } = this.state;
     return (
       <View style={styles.container}>
       <ScrollView>
       <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
+      {isAuthentication === 2 ? <Text style={{ color: '#df8889', alignSelf: 'center', marginTop: p(5) }}>驳回理由：{reason}</Text> : null}
         <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
         <TextInput style={styles.input1} placeholder='请输入档案编号' value={fileNumber} onChangeText={(value) => { this.setState({ fileNumber: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this, 'driverLicenseStartTime')}>
@@ -129,11 +132,11 @@ class DriveCardAuthScreen extends React.Component{
       </View>
         <Text style={styles.text}>驾驶证照片</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'driverFile')}>
-          <Image source={driverFile ? {uri: driverFile} : IMAGES.front} style={styles.image}/>
+          <Image source={driverFile ? {uri: `${host}${driverFile}`} : IMAGES.front} style={styles.image}/>
         </TouchableOpacity>
         <Text style={styles.text}>驾驶证照片</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'copyDriverLicenseUrl')}>
-          <Image source={copyDriverLicenseUrl ? {uri: copyDriverLicenseUrl} : IMAGES.front} style={styles.image}/>
+          <Image source={copyDriverLicenseUrl ? {uri: `${host}${copyDriverLicenseUrl}`} : IMAGES.front} style={styles.image}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>

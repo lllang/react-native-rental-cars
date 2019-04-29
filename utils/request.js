@@ -23,4 +23,5 @@ export function api(url, params) {
   }
   Toast.show('请先登录');
   navigate('login');
+  return Promise.reject({});
 }

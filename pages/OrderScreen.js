@@ -88,7 +88,13 @@ export default class OrderScreen extends React.Component{
     })
   }
   componentDidMount() {
-    this.search();
+    this.focusListener = this.props.navigation.addListener("didFocus", async () => {
+      this.search();
+    })
+  }
+  componentWillUnmount() {
+    // Remove the event listener
+    this.focusListener && this.focusListener.remove();
   }
   renderItem = ({item}) => {
     const colors = ['', '#00B1A0', '#00B1A0', '#00B1A0', '#C5C5C5', '#FF8F16']

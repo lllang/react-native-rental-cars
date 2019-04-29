@@ -14,6 +14,7 @@ class DepositScreen extends React.Component{
   state = {
     deposit: {},
     isRefuned: false,
+    depositAmount: 500,
   }
   submit = () => {
     if (this.state.deposit.idDeposit) {
@@ -44,6 +45,16 @@ class DepositScreen extends React.Component{
   componentWillMount() {
     this.getDeposit();
     this.isRefuned();
+    this.depositNum();
+  }
+  depositNum() {
+    api('/api/dsDepositAudit/depositAmount', {}).then((res) => {
+      if(res.data && res.data.success) {
+        this.setState({
+          depositAmount: res.data.data || 500,
+        });
+      }
+    })
   }
   isRefuned() {
     api('/api/dsDepositAudit/isRefunded', {}).then((res) => {
@@ -78,7 +89,7 @@ class DepositScreen extends React.Component{
             <Text style={styles.renminbi}>￥</Text>
             <Text style={styles.deposit}>{deposit.deposit || 0}元</Text>
           </View>: <View>
-            <Text>{this.state.isRefuned ? '押金退款中' : '您还未交押金'}</Text>
+            <Text>{this.state.isRefuned ? '押金退款中' : `您还未交押金，您需交押金${this.state.depositAmount}元`}</Text>
           </View>}
         </View> 
         {this.state.isRefunded ? null : <TouchableOpacity style={styles.submit} onPress={this.submit}>

@@ -23,10 +23,12 @@ class CardAuthScreen extends React.Component{
   state = {
     code: this.cardInfo.find(i => i.key === 'card_id') && this.cardInfo.find(i => i.key === 'card_id').value || '',
     front: this.cardInfo.find(i => i.key === 'card_front_url') && this.cardInfo.find(i => i.key === 'card_front_url').value
-    ? `${host}${this.cardInfo.find(i => i.key === 'card_front_url').value}` : '',
+    ? `${this.cardInfo.find(i => i.key === 'card_front_url').value}` : '',
     end: this.cardInfo.find(i => i.key === 'card_back_url') && this.cardInfo.find(i => i.key === 'card_back_url').value
-    ? `${host}${this.cardInfo.find(i => i.key === 'card_back_url').value}` : '',
+    ? `${this.cardInfo.find(i => i.key === 'card_back_url').value}` : '',
     cardType: this.cardInfo.find(i => i.key === 'card_type') && this.cardInfo.find(i => i.key === 'card_type').value || '',
+    reason: this.cardInfo.find(i => i.key === 'card_id') && this.cardInfo.find(i => i.key === 'card_id').reason || '',
+    isAuthentication: this.cardInfo.find(i => i.key === 'card_id') && this.cardInfo.find(i => i.key === 'card_id').isAuthentication || 0,
   }
   submit = () => {
     const { code, cardType, front, end } = this.state;
@@ -95,11 +97,11 @@ class CardAuthScreen extends React.Component{
           console.log(res);
           if (type === 'handleFile') {
             this.setState({
-              front: `${host}${res.data.data}`
+              front: `${res.data.data}`
             });
           } else {
             this.setState({
-              end: `${host}${res.data.data}`
+              end: `${res.data.data}`
             })
           }
         })
@@ -108,11 +110,12 @@ class CardAuthScreen extends React.Component{
   };
   render() {
     const { userInfo } = this.props;
-    const { front, end, cardType, code } = this.state;
+    const { front, end, cardType, code, isAuthentication, reason } = this.state;
     return (
       <View style={styles.container}>
       <ScrollView >
         <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
+        {isAuthentication === 2 ? <Text style={{ color: '#df8889', alignSelf: 'center', marginTop: p(5) }}>驳回理由：{reason}</Text> : null}
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this)}>
           <Text style={styles.date}>{['', '身份证', '护照'][cardType] || '请选择'}</Text>
         </TouchableOpacity>
@@ -122,11 +125,11 @@ class CardAuthScreen extends React.Component{
         </View>
         <Text style={styles.text}>身份证正面</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'handleFile')}>
-          <Image source={front ? {uri: front} : IMAGES.front} style={styles.image}/>
+          <Image source={front ? {uri: `${host}${front}`} : IMAGES.front} style={styles.image}/>
         </TouchableOpacity>
         <Text style={styles.text}>身份证反面</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'backFile')}>
-          <Image source={end ? {uri: end} : IMAGES.end} style={styles.image}/>
+          <Image source={end ? {uri: `${host}${end}`} : IMAGES.end} style={styles.image}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>

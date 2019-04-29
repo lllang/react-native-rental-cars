@@ -27,6 +27,7 @@ class CardScreen extends React.Component{
           this.setState({
             cardInfo: res.data.data,
             cardStatus: res.data.data.find(i => i.key === 'card_id') ? res.data.data.find(i => i.key === 'card_id').isAuthentication : 0,
+
             driveCardStatus: res.data.data.find(i => i.key === 'driver_license_id') ? res.data.data.find(i => i.key === 'driver_license_id').isAuthentication : 0,
           })
         } else {

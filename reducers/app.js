@@ -24,12 +24,12 @@ export const updateUserInfo = (userInfo) => (dispatch) => {
 }
 
 export const getUserInfo = (token) => async (dispatch, getState) => {
-  const data = await post(`/app/user/getUserInfo`, {
+  const { data } = await post(`/app/user/getUserInfo`, {
     token
   })
   console.log(data);
   if (data && data.success) {
-    const userInfo = {...getState().userInfo, ...data.data}
+    const userInfo = {...data.data, token}
     dispatch({ type: 'app/set/userInfo', payload: { userInfo } })
   }
 }
