@@ -1,5 +1,6 @@
 import React from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native'
+import Dialog from "react-native-dialog";
 import Toast from 'react-native-simple-toast';
 import { connect } from 'react-redux';
 import { p } from '../utils/resolutions'
@@ -14,33 +15,43 @@ class DepositScreen extends React.Component{
   state = {
     deposit: {},
     isRefunded: false,
+    dialogVisible: false,
     depositAmount: 500,
   }
+  showDialog = () => {
+    this.setState({ dialogVisible: true });
+  };
+ 
+  handleCancel = () => {
+    this.setState({ dialogVisible: false });
+  };
   submit = () => {
-    if (this.state.deposit.idDeposit) {
-      api('/api/dsDepositAudit/UserDepositAuditState', {}).then((res) => {
-        if(res.data && res.data.success) {
-          Toast.show('申请成功');
-          this.getDeposit();
-          this.isRefunded();
-        } else {
-          Toast.show(res.data && res.data.msg || '请求失败');
-        }
-      })
-    } else {
-      api('/api/dsDepositAudit/userPayDeposit1', {}).then((res) => {
-        if(res.data && res.data.success) {
-          this.setState({
-            deposit: res.data.data,
-          });
-          this.getDeposit();
-          this.isRefunded();
-          Toast.show('押金提交成功');
-        } else {
-          Toast.show(res.data && res.data.msg || '请求失败');
-        }
-      })
-    }
+    this.setState({ dialogVisible: false }, () => {
+      if (this.state.deposit.idDeposit) {
+        api('/api/dsDepositAudit/UserDepositAuditState', {}).then((res) => {
+          if(res.data && res.data.success) {
+            Toast.show('申请成功');
+            this.getDeposit();
+            this.isRefunded();
+          } else {
+            Toast.show(res.data && res.data.msg || '请求失败');
+          }
+        })
+      } else {
+        api('/api/dsDepositAudit/userPayDeposit1', {}).then((res) => {
+          if(res.data && res.data.success) {
+            this.setState({
+              deposit: res.data.data,
+            });
+            this.getDeposit();
+            this.isRefunded();
+            Toast.show('押金提交成功');
+          } else {
+            Toast.show(res.data && res.data.msg || '请求失败');
+          }
+        })
+      }
+    });
   }
   componentWillMount() {
     this.getDeposit();
@@ -92,9 +103,17 @@ class DepositScreen extends React.Component{
             <Text>{this.state.isRefunded ? '押金退款中' : `您还未交押金，您需交押金${this.state.depositAmount}元`}</Text>
           </View>}
         </View> 
-        {this.state.isRefunded ? null : <TouchableOpacity style={styles.submit} onPress={this.submit}>
+        {this.state.isRefunded ? null : <TouchableOpacity style={styles.submit} onPress={this.showDialog}>
           <Text style={styles.submitText}>{deposit.idDeposit ? '退押金' : '交押金'}</Text>
         </TouchableOpacity>}
+        <Dialog.Container visible={this.state.dialogVisible}>
+          <Dialog.Title>提醒</Dialog.Title>
+          <Dialog.Description>
+            确定要{deposit.idDeposit ? '退押金' : '交押金'}吗？
+          </Dialog.Description>
+          <Dialog.Button label="确定" onPress={this.submit} />
+          <Dialog.Button label="取消" onPress={this.handleCancel} />
+        </Dialog.Container>
       </View>
     )
   }
