@@ -6,6 +6,7 @@ import { setAuth } from '../utils/storage';
 import { isPhone } from '../utils/vali';
 import Toast from 'react-native-simple-toast';
 import PropTypes from 'prop-types';
+import { Loading } from '../utils/loading';
 
 export default class LoginScrren extends Component{
   state = {
@@ -25,15 +26,18 @@ export default class LoginScrren extends Component{
       Toast.show('请输入正确的手机号和密码');
       return;
     }
+    Loading.show()
     post('/app/user/oauth', { tel: this.state.tel, password: this.state.password }).then(async (res) => {
       console.log(res)
       if (res.data && res.data.success) {
+        Loading.hidden();
         Toast.show('登录成功')
         await setAuth(res.data.data)
         console.log(res.data.data)
         this.context.actions.updateUserInfo(res.data.data);
         this.props.navigation.replace('home');
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '登录失败')
       }
     }, (res) => {

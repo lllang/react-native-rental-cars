@@ -115,9 +115,9 @@ export default class OrderDetailScreen extends React.Component{
         <View style={[styles.textView, styles.margin10]}>
           <Text style={styles.name}>{carInfo.carTypeName}  {carInfo.carTypeSeat}座  </Text>
           <Text style={styles.number}>{carInfo.carNumber}  </Text>
-          <Image source={IMAGES.oil} style={styles.oil}/>
-          <Text style={styles.number}>{carInfo.endOil}L  </Text>
-          <Text style={styles.number}>最大续航{carInfo.maxMileageEndurance}公里</Text>
+          {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
+          {/* <Text style={styles.number}>{carInfo.endOil}L  </Text> */}
+          <Text style={styles.number}>剩余续航{carInfo.extensionMileage}km  最大续航{carInfo.maxMileageEndurance}km</Text>
         </View>
         <View style={[styles.textView, styles.margin20]}>
           <Text style={styles.fee}>车辆收费时长</Text>

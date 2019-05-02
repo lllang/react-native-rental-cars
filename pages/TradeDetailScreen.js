@@ -44,9 +44,12 @@ export default class TradeDetailScreen extends React.Component{
       <TouchableOpacity style={styles.item}>
         <View style={styles.itemTop}>
           <Text style={styles.type}>{['消费', '充值', '提现', '取消提现', '退押金成功', '退押金驳回', '交押金'][item.type] || ''}</Text>
+          <Text style={styles.num}>{item.num}</Text>
+        </View>
+        <View style={styles.itemTop}>
+          <Text style={styles.time}>{format(item.createTime, 'YYYY/MM/DD HH:mm:ss')}</Text>
           <Text style={styles.num}>{item.lastMoney}</Text>
         </View>
-        <Text style={styles.time}>{format(item.createTime, 'YYYY/MM/DD HH:mm:ss')}</Text>
       </TouchableOpacity>
     )
   }

@@ -7,6 +7,7 @@ import { setAuth } from '../utils/storage';
 import { isPhone } from '../utils/vali';
 import Toast from 'react-native-simple-toast';
 import PropTypes from 'prop-types';
+import { Loading } from '../utils/loading';
 
 const CODE_TIMEOUT_SECONDS = 60;
 
@@ -35,24 +36,29 @@ export default class SignUpScreen extends Component{
       Toast.show('请保证两次输入的密码是一样的');
       return;
     }
+    Loading.show();
     post(this.isSignUp ? '/app/user/addUser' : '/app/user/resetPassword', { tel: this.state.tel, password: this.state.password, code: this.state.code }).then((res) => {
       if(res.data && res.data.success) {
         Toast.show(this.isSignUp ? '注册成功' : '找回成功');
         post('/app/user/oauth', { tel: this.state.tel, password: this.state.password }).then(async (res1) => {
           console.log(res1)
           if (res1.data && res1.data.success) {
+            Loading.hidden();
             Toast.show('登录成功')
             await setAuth(res1.data.data)
             console.log(res1.data.data)
             this.context.actions.updateUserInfo(res1.data.data);
             this.props.navigation.replace('home');
           } else {
+            Loading.hidden();
             Toast.show(res1.data && res1.data.msg || '登录失败')
           }
         }, (res1) => {
+          Loading.hidden();
           Toast.show('登录失败')
         });
       } else {
+        Loading.hidden();
         Toast.show(res.data && res.data.msg || '请求失败');
       }
     });

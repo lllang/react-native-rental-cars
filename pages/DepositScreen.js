@@ -13,7 +13,7 @@ class DepositScreen extends React.Component{
   }
   state = {
     deposit: {},
-    isRefuned: false,
+    isRefunded: false,
     depositAmount: 500,
   }
   submit = () => {
@@ -22,7 +22,7 @@ class DepositScreen extends React.Component{
         if(res.data && res.data.success) {
           Toast.show('申请成功');
           this.getDeposit();
-          this.isRefuned();
+          this.isRefunded();
         } else {
           Toast.show(res.data && res.data.msg || '请求失败');
         }
@@ -34,7 +34,7 @@ class DepositScreen extends React.Component{
             deposit: res.data.data,
           });
           this.getDeposit();
-          this.isRefuned();
+          this.isRefunded();
           Toast.show('押金提交成功');
         } else {
           Toast.show(res.data && res.data.msg || '请求失败');
@@ -44,7 +44,7 @@ class DepositScreen extends React.Component{
   }
   componentWillMount() {
     this.getDeposit();
-    this.isRefuned();
+    this.isRefunded();
     this.depositNum();
   }
   depositNum() {
@@ -56,15 +56,15 @@ class DepositScreen extends React.Component{
       }
     })
   }
-  isRefuned() {
+  isRefunded() {
     api('/api/dsDepositAudit/isRefunded', {}).then((res) => {
       if(res.data && res.data.success) {
         this.setState({
-          isRefuned: true,
+          isRefunded: true,
         });
       } else {
         this.setState({
-          isRefuned: false,
+          isRefunded: false,
         });
       }
     })
@@ -84,12 +84,12 @@ class DepositScreen extends React.Component{
     return (
       <View style={styles.container}>
         <View style={styles.card}>
-        {deposit.idDeposit && !this.state.isRefuned ? 
+        {deposit.idDeposit && !this.state.isRefunded ? 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={styles.renminbi}>￥</Text>
             <Text style={styles.deposit}>{deposit.deposit || 0}元</Text>
           </View>: <View>
-            <Text>{this.state.isRefuned ? '押金退款中' : `您还未交押金，您需交押金${this.state.depositAmount}元`}</Text>
+            <Text>{this.state.isRefunded ? '押金退款中' : `您还未交押金，您需交押金${this.state.depositAmount}元`}</Text>
           </View>}
         </View> 
         {this.state.isRefunded ? null : <TouchableOpacity style={styles.submit} onPress={this.submit}>
