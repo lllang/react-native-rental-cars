@@ -34,6 +34,14 @@ class DriveCardAuthScreen extends React.Component{
   }
   submit = () => {
     const { code, driverLicenseStartTime, driverLicenseEndTime, driverFile, fileNumber, copyDriverLicenseUrl } = this.state;
+    if (this.state.isAuthentication === 1) {
+      Toast.show('请等待审核');
+      return;
+    }
+    if (this.state.isAuthentication === 3) {
+      Toast.show('已认证，无须重复认证');
+      return;
+    }
     if (!code || !driverFile || !driverLicenseStartTime || !driverLicenseEndTime || !fileNumber || !copyDriverLicenseUrl) {
       Toast.show('请填写完整信息');
       return;
@@ -60,6 +68,9 @@ class DriveCardAuthScreen extends React.Component{
     
   }
   onButtonPress = (type) => {
+    if (this.state.isAuthentication === 1 || this.state.isAuthentication === 3) {
+      return;
+    }
     this.refs.datePicker.show({
       title: '请选择',
       mode: 'date',
@@ -77,6 +88,9 @@ class DriveCardAuthScreen extends React.Component{
     })
   }
   onPickPhotoClicked = (type) => {
+    if (this.state.isAuthentication === 1 || this.state.isAuthentication === 3) {
+      return;
+    }
     const options = {
       title: '选择照片',
       maxWidth: 1024,
@@ -121,8 +135,16 @@ class DriveCardAuthScreen extends React.Component{
       <ScrollView>
       <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
       {isAuthentication === 2 ? <Text style={{ color: '#df8889', alignSelf: 'center', marginTop: p(5) }}>驳回理由：{reason}</Text> : null}
-        <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
-        <TextInput style={styles.input1} placeholder='请输入档案编号' value={fileNumber} onChangeText={(value) => { this.setState({ fileNumber: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
+        {
+          this.state.isAuthentication === 1 || this.state.isAuthentication === 3
+            ? <Text style={styles.input1}>{code}</Text>
+            : <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
+        }
+        {
+          this.state.isAuthentication === 1 || this.state.isAuthentication === 3
+            ? <Text style={styles.input1}>{fileNumber}</Text>
+            : <TextInput style={styles.input1} placeholder='请输入档案编号' value={fileNumber} onChangeText={(value) => { this.setState({ fileNumber: value.replace(/[^0-9a-zA-Z]/g, '') }) }}/>
+        }
         <TouchableOpacity style={styles.input1} onPress={this.onButtonPress.bind(this, 'driverLicenseStartTime')}>
           <Text style={styles.date}>{driverLicenseStartTime || '有效期开始时间'}</Text>
         </TouchableOpacity>

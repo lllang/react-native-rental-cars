@@ -50,14 +50,6 @@ class CardScreen extends React.Component{
           <Text style={styles.text}>身份证认证</Text>
           <Text style={styles.text1}>个人用户真实身份确认</Text>
           <TouchableOpacity style={styles.button} onPress={() => {
-            // if (cardStatus === 1) {
-            //   Toast.show('请等待审核');
-            //   return;
-            // }
-            // if (cardStatus === 3) {
-            //   Toast.show('无须重复认证');
-            //   return;
-            // }
             this.props.navigation.push('cardAuth', { cardInfo });
           }}>
             <Text style={styles.buttonText}>{map[cardStatus]}</Text>
@@ -68,14 +60,6 @@ class CardScreen extends React.Component{
           <Text style={styles.text}>驾驶证认证</Text>
           <Text style={styles.text1}>有效证件真实身份确认</Text>
           <TouchableOpacity style={styles.button} onPress={() => {
-            if (driveCardStatus === 1) {
-              Toast.show('请等待审核');
-              return;
-            }
-            if (driveCardStatus === 3) {
-              Toast.show('无须重复认证');
-              return;
-            }
             this.props.navigation.push('driveCardAuth', { cardInfo });
           }}>
             <Text style={styles.buttonText}>{map[driveCardStatus]}</Text>

@@ -88,8 +88,10 @@ export default class OrderScreen extends React.Component{
     })
   }
   componentDidMount() {
-    this.focusListener = this.props.navigation.addListener("didFocus", async () => {
-      this.search();
+    this.focusListener = this.props.navigation.addListener("didFocus", () => {
+      this.setState({
+        pn: 1
+      }, this.search)
     })
   }
   componentWillUnmount() {
@@ -119,7 +121,6 @@ export default class OrderScreen extends React.Component{
       refreshState,
       status
     } = this.state;
-    console.log(list)
     return (
       <View style={styles.container}>
         <View style={styles.tabs}>

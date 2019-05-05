@@ -32,6 +32,14 @@ class CardAuthScreen extends React.Component{
   }
   submit = () => {
     const { code, cardType, front, end } = this.state;
+    if (this.state.isAuthentication === 1) {
+      Toast.show('请等待审核');
+      return;
+    }
+    if (this.state.isAuthentication === 3) {
+      Toast.show('已认证，无须重复认证');
+      return;
+    }
     if (!code || !end || !front || !cardType) {
       Toast.show('请填写完整信息');
       return;
@@ -55,6 +63,9 @@ class CardAuthScreen extends React.Component{
     })
   }
   onButtonPress = () => {
+    if (this.state.isAuthentication === 1 || this.state.isAuthentication === 3) {
+      return;
+    }
     this.refs.picker.show({
       title: '请选择',
       options: [{label: '身份证', value: 1}, {label: '护照', value: 2}],
@@ -71,6 +82,9 @@ class CardAuthScreen extends React.Component{
     })
   }
   onPickPhotoClicked = (type) => {
+    if (this.state.isAuthentication === 1 || this.state.isAuthentication === 3) {
+      return;
+    }
     const options = {
       title: '选择照片',
       maxWidth: 1024,
@@ -121,7 +135,11 @@ class CardAuthScreen extends React.Component{
         </TouchableOpacity>
         </View>
         <View style={{ backgroundColor: '#fff', paddingBottom: p(10)}}>
-          <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9Xx]/g, '') }) }}/>
+        {
+          this.state.isAuthentication === 1 || this.state.isAuthentication === 3
+            ? <Text style={styles.input1}>{code}</Text>
+            : <TextInput style={styles.input1} placeholder='请输入证件号码' value={code} onChangeText={(value) => { this.setState({ code: value.replace(/[^0-9Xx]/g, '') }) }}/>
+        }
         </View>
         <Text style={styles.text}>身份证正面</Text>
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'handleFile')}>

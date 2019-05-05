@@ -181,12 +181,12 @@ class HomeScreen extends React.Component{
       showCar: false,
       showCarList: true,
       refundCar: '',
-      endNetworkId: '',
     })
+    this.context.actions.updateSelected({})
   }
 
   confirmPress(item) {
-    if(!this.state.endNetworkId) {
+    if(!this.props.selected.endNetworkId) {
       Toast.show('请先选择还车网点');
       return;
     }
@@ -194,7 +194,7 @@ class HomeScreen extends React.Component{
     api('/api/dsOrder/addOrder', {
       carId: item.dsCar.id,
       startNetworkId: this.state.startNetworkId,
-      endNetworkId: this.state.endNetworkId,
+      endNetworkId: this.props.selected.endNetworkId,
       state: 1,
     }).then(res => {
       if (res.data && res.data.success) {
@@ -256,16 +256,18 @@ class HomeScreen extends React.Component{
   }
 
   refundCar = () => {
-    this.refs.picker.show({
-      title: '请选择',
-      options: this.state.netWorkList.map(i => ({ label: i.name, value: i.id })),
-      onSubmit: (option) => {
-        this.setState({
-          endNetworkId: option.value,
-          refundCar: option.label,
-        })
-      },
-    })
+    this.context.actions.updateSelected({});
+    // this.refs.picker.show({
+    //   title: '请选择',
+    //   options: this.state.netWorkList.map(i => ({ label: i.name, value: i.id })),
+    //   onSubmit: (option) => {
+    //     this.setState({
+    //       endNetworkId: option.value,
+    //       refundCar: option.label,
+    //     })
+    //   },
+    // })
+    this.props.navigation.push('selectMap');
   }
 
   op(type) {
@@ -352,7 +354,6 @@ class HomeScreen extends React.Component{
       showCar: false, // 是否展示车辆详情
       carInfo: {}, // 要展示的车辆详情信息
       startNetworkId: '',
-      endNetworkId: '',
       getCar: '',
       refundCar: '',
       showUseCar: false,
@@ -361,6 +362,7 @@ class HomeScreen extends React.Component{
       visible: false,
     }, () => {
       this.checkUseCar();
+      this.context.actions.updateSelected({})
       this.getCars({
         lat: this.state.centerLat,
         lng: this.state.centerLng,
@@ -375,6 +377,8 @@ class HomeScreen extends React.Component{
 
   render() {
     const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible } = this.state
+    const { endNetworkId, endNetworkName } = this.props.selected;
+    console.log(this.props);
     return (
       <SafeAreaView style={styles.container}>
        <View style={styles.header}>
@@ -475,7 +479,7 @@ class HomeScreen extends React.Component{
             </TouchableOpacity>
             <TouchableOpacity style={[styles.point]} onPress={this.refundCar}>
               <Text style={styles.getCar}>还车点：</Text>
-              <Text style={styles.getCarText}>{refundCar || '请选择'}</Text>
+              <Text style={styles.getCarText}>{endNetworkName || '请选择'}</Text>
               <Image source={IMAGES.right} style={styles.iconRight}/>
             </TouchableOpacity>
             <View style={styles.buttons}>
@@ -824,5 +828,6 @@ const styles = StyleSheet.create({
 })
 
 export default connect(state => ({
-  position: state.app.position
+  position: state.app.position,
+  selected: state.app.selected,
 }))(HomeScreen)
