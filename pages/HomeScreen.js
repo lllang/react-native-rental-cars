@@ -69,7 +69,6 @@ class HomeScreen extends React.Component{
   }
   checkUseCar() {
     api('/api/dsOrder/inUseOrder', {}).then(res => {
-      console.log(res);
       if (res.data && res.data.success) {
         this.setState({
           showTips: true,
@@ -371,6 +370,7 @@ class HomeScreen extends React.Component{
   }
 
   load = (index) => {
+    console.log('load');
     this.marker[index].componentDidUpdate()
     setTimeout(() => this.marker[index].componentDidUpdate(), 200)
   }
@@ -378,7 +378,6 @@ class HomeScreen extends React.Component{
   render() {
     const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible } = this.state
     const { endNetworkId, endNetworkName } = this.props.selected;
-    console.log(this.props);
     return (
       <SafeAreaView style={styles.container}>
        <View style={styles.header}>

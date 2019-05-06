@@ -107,7 +107,7 @@ class SelectMap extends React.Component{
         {netWorkList && netWorkList.length > 0 ? netWorkList.map((item, index) => 
           <Marker ref={ref => this.marker[index] = ref} onPress={this.showDialog.bind(this, item)} coordinate={{latitude: Number(item.latitude), longitude: Number(item.longitude)}} key={item.id} icon={() => (
               <TouchableOpacity><ImageBackground onLoadEnd={this.load.bind(this, index)} source={IMAGES.map} style={{ width: p(36), height: p(36), alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: p(15), color: '#fff', position: 'relative', top: p(-2) }}>{item.total}</Text>
+                <Text style={{ fontSize: p(15), color: '#fff', position: 'relative', top: p(-2) }}>{item.num}</Text>
               </ImageBackground></TouchableOpacity>
           )}>
           <View></View>

@@ -20,7 +20,7 @@
     "react": "16.8.3",
     "react-native": "0.59.4",
     "react-native-amap-geolocation": "^0.3.2",
-    "react-native-amap3d": "https://github.com/25juan/react-native-amap3d#master",
+    "react-native-amap3d": "https://github.com/lllang/react-native-amap3d#master",
     "react-native-background-timer": "^2.1.1",
     "react-native-date-picker": "^2.3.0",
     "react-native-dialog": "^5.6.0",

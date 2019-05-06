@@ -160,9 +160,10 @@ class DriveCardAuthScreen extends React.Component{
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'copyDriverLicenseUrl')}>
           <Image source={copyDriverLicenseUrl ? {uri: `${host}${copyDriverLicenseUrl}`} : IMAGES.front} style={styles.image}/>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submit} onPress={this.submit}>
+        {this.state.isAuthentication === 1 || this.state.isAuthentication === 3
+            ? null : <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </ScrollView>
         <DatePicker ref="datePicker" />
       </View>

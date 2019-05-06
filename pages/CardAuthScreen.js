@@ -149,9 +149,10 @@ class CardAuthScreen extends React.Component{
         <TouchableOpacity onPress={this.onPickPhotoClicked.bind(this, 'backFile')}>
           <Image source={end ? {uri: `${host}${end}`} : IMAGES.end} style={styles.image}/>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.submit} onPress={this.submit}>
+        {this.state.isAuthentication === 1 || this.state.isAuthentication === 3
+            ? null :  <TouchableOpacity style={styles.submit} onPress={this.submit}>
           <Text style={styles.submitText}>提交</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </ScrollView>
         <Picker ref="picker" />
         </View>
