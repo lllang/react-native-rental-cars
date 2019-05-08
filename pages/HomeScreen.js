@@ -142,6 +142,7 @@ class HomeScreen extends React.Component{
     this.setState({
       centerLat: nativeEvent.latitude,
       centerLng: nativeEvent.longitude,
+      zoomLevel: nativeEvent.zoomLevel,
     })
     this.getCars({
       lat: nativeEvent.latitude,
@@ -254,19 +255,8 @@ class HomeScreen extends React.Component{
     })
   }
 
-  refundCar = () => {
-    this.context.actions.updateSelected({});
-    // this.refs.picker.show({
-    //   title: '请选择',
-    //   options: this.state.netWorkList.map(i => ({ label: i.name, value: i.id })),
-    //   onSubmit: (option) => {
-    //     this.setState({
-    //       endNetworkId: option.value,
-    //       refundCar: option.label,
-    //     })
-    //   },
-    // })
-    this.props.navigation.push('selectMap');
+  refundCar = (edit, id) => {
+    this.props.navigation.push('selectMap', { edit, id });
   }
 
   op(type) {
@@ -364,6 +354,7 @@ class HomeScreen extends React.Component{
       this.context.actions.updateSelected({})
       this.getCars({
         lat: this.state.centerLat,
+        zoomLevel: this.state.zoomLevel,
         lng: this.state.centerLng,
       });
     });
@@ -376,8 +367,8 @@ class HomeScreen extends React.Component{
   }
 
   render() {
-    const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, refundCar, showUseCar, useCarInfo, psw, visible } = this.state
-    const { endNetworkId, endNetworkName } = this.props.selected;
+    const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, showUseCar, useCarInfo, psw, visible } = this.state
+    const { endNetworkName } = this.props.selected;
     return (
       <SafeAreaView style={styles.container}>
        <View style={styles.header}>
@@ -406,12 +397,11 @@ class HomeScreen extends React.Component{
             onStatusChangeComplete={this._logStatusChangeCompleteEvent}
           >
             {netWorkList && netWorkList.length > 0 ? netWorkList.map((item, index) => 
-              <Marker ref={ref => this.marker[index] = ref} onPress={this.netWorkPress.bind(this, item)} coordinate={{latitude: Number(item.latitude), longitude: Number(item.longitude)}} key={item.id} icon={() => (
-                  <TouchableOpacity><ImageBackground onLoadEnd={this.load.bind(this, index)} source={IMAGES.map} style={{ width: p(36), height: p(36), alignItems: 'center', justifyContent: 'center' }}>
+              <Marker onPress={this.netWorkPress.bind(this, item)} title={item.name} coordinate={{latitude: Number(item.latitude), longitude: Number(item.longitude)}} key={item.id} icon={() => (
+                  <TouchableOpacity><ImageBackground source={IMAGES.map} style={{ width: p(36), height: p(36), alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontSize: p(15), color: '#fff', position: 'relative', top: p(-2) }}>{item.total}</Text>
                   </ImageBackground></TouchableOpacity>
               )}>
-              <View></View>
             </Marker>
             ) : null}
             {netWorkList && netWorkList.length > 0 ? netWorkList.map((item, index) => 
@@ -476,7 +466,7 @@ class HomeScreen extends React.Component{
               <Text style={styles.getCarText}>{getCar || '请选择'}</Text>
               <Image source={IMAGES.right} style={styles.iconRight}/>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.point]} onPress={this.refundCar}>
+            <TouchableOpacity style={[styles.point]} onPress={() => { this.refundCar() }}>
               <Text style={styles.getCar}>还车点：</Text>
               <Text style={styles.getCarText}>{endNetworkName || '请选择'}</Text>
               <Image source={IMAGES.right} style={styles.iconRight}/>
@@ -549,6 +539,9 @@ class HomeScreen extends React.Component{
               </TouchableOpacity>
               <TouchableOpacity style={[styles.button1, styles.blue]} onPress={this.refresh.bind(this)}>
                 <Text style={styles.blueText}>刷新密码</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button1, styles.blue]} onPress={() => { this.refundCar(1, useCarInfo.id) }}>
+                <Text style={styles.blueText}>修改还车网点</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>

@@ -4,7 +4,7 @@ import { MapView, Marker, Polygon } from 'react-native-amap3d'
 import { p } from '../utils/resolutions'
 import PropTypes from 'prop-types'
 import Dialog from "react-native-dialog";
-import { post, api } from '../utils/request'
+import { post } from '../utils/request'
 import { SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux'
 import Toast from 'react-native-simple-toast'
@@ -77,8 +77,22 @@ class SelectMap extends React.Component{
   };
 
   selectNetwork = () => {
-    this.context.actions.updateSelected({ endNetworkId: this.state.item.id, endNetworkName: this.state.item.name })
-    this.props.navigation.pop()
+    if (this.props.navigation.getParam('edit')) {
+      post('/api/dsOrder/modifyNet', {
+        id: this.props.navigation.getParam('id'),
+        endNetworkId: this.state.item.id
+      }).then(res => {
+        if (res.data && res.data.success) {
+          this.context.actions.updateSelected({ endNetworkId: this.state.item.id, endNetworkName: this.state.item.name })
+          this.props.navigation.pop()
+        } else {
+          Toast.show(res.data && res.data.msg || '修改失败');
+        }
+      })
+    } else {
+      this.props.navigation.pop()
+      this.context.actions.updateSelected({ endNetworkId: this.state.item.id, endNetworkName: this.state.item.name })
+    }
   }
 
   render() {

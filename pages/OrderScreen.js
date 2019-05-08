@@ -19,6 +19,9 @@ const tabs = [{
 }, {
   name: '已完成',
   value: 4,
+}, {
+  name: '违章',
+  value: 5,
 }]
 
 export default class OrderScreen extends React.Component{
