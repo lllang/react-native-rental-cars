@@ -122,7 +122,7 @@ export default class OrderDetailScreen extends React.Component{
         <View style={[styles.textView, styles.margin20]}>
           <Text style={styles.fee}>车辆收费时长</Text>
           <Text style={[styles.fee, styles.fee1]}>{carInfo.timeCharge}</Text>
-          <Text style={styles.fee}>元/小时，</Text>
+          <Text style={styles.fee}>元/分钟，</Text>
           <Text style={styles.fee}>车辆里程收费</Text>
           <Text style={[styles.fee, styles.fee1]}>{carInfo.mileageCharge}</Text>
           <Text style={styles.fee}>元/公里</Text>

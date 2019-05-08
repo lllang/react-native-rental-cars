@@ -24,7 +24,9 @@ class SelectMap extends React.Component{
     actions: PropTypes.object
   }
   static navigationOptions = {
-    header: null,
+    title: '选择还车网点',
+    headerBackTitle: '返回',
+    headerTruncatedBackTitle: '返回',
   }
   state = {
     lat: 39.91095,

@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground, Scrol
 import { MapView, Marker, Polygon } from 'react-native-amap3d'
 import { p } from '../utils/resolutions'
 import PropTypes from 'prop-types'
+import timers from 'react-native-background-timer'
 import { getAuth } from '../utils/storage'
 import { post, api } from '../utils/request'
 import Picker from '../components/Picker';
@@ -49,6 +50,7 @@ class HomeScreen extends React.Component{
     useCarInfo: {},
     psw: '',
     visible: false,
+    money: 0,
     showTips: false,
     centerLat: '',
     centerLng: '',
@@ -66,6 +68,22 @@ class HomeScreen extends React.Component{
       this.context.actions.getUserInfo(userInfo.token);
       this.checkUseCar();
     })
+    this.codeBtnHandler = timers.setInterval(() => {
+      this.getFee();
+    }, 30000);
+  }
+  getFee() {
+    if (this.state.useCarInfo.id) {
+      api('/api/dsOrder/queryOrder', { id: this.state.useCarInfo.id }).then((res) => {
+        if(res.data && res.data.success) {
+          this.setState({
+            money: res.data.data.money
+          })
+        } else {
+          Toast.show(res.data && res.data.msg || '获取价格失败');
+        }
+      })
+    }
   }
   checkUseCar() {
     api('/api/dsOrder/inUseOrder', {}).then(res => {
@@ -104,6 +122,10 @@ class HomeScreen extends React.Component{
   componentWillUnmount() {
     // Remove the event listener
     this.focusListener && this.focusListener.remove();
+    if (this.codeBtnHandler) {
+      timers.clearInterval(this.codeBtnHandler);
+      this.codeBtnHandler = null;
+    }
   }
   getCars(coor) {
     post('/app/dsCarNetwork/getNetWork', {
@@ -367,7 +389,7 @@ class HomeScreen extends React.Component{
   }
 
   render() {
-    const { carList, firstLat, usingCarInfo, firstLng, netWorkList, showTips, showCarList, showCar, carInfo, getCar, showUseCar, useCarInfo, psw, visible } = this.state
+    const { carList, firstLat, usingCarInfo, firstLng, money, netWorkList, showTips, showCarList, showCar, carInfo, getCar, showUseCar, useCarInfo, psw, visible } = this.state
     const { endNetworkName } = this.props.selected;
     return (
       <SafeAreaView style={styles.container}>
@@ -430,7 +452,7 @@ class HomeScreen extends React.Component{
               <View style={[styles.row, styles.margin20]}>
                 <Text style={styles.fee}>车辆收费时长</Text>
                 <Text style={[styles.fee, styles.fee1]}>{item.dsCarType.timeCharge}</Text>
-                <Text style={styles.fee}>元/小时，</Text>
+                <Text style={styles.fee}>元/分钟，</Text>
                 <Text style={styles.fee}>车辆里程收费</Text>
                 <Text style={[styles.fee, styles.fee1]}>{item.dsCarType.mileageCharge}</Text>
                 <Text style={styles.fee}>元/公里</Text>
@@ -456,7 +478,7 @@ class HomeScreen extends React.Component{
             <View style={[styles.row, styles.margin20]}>
               <Text style={styles.fee}>车辆收费时长</Text>
               <Text style={[styles.fee, styles.fee1]}>{carInfo.dsCarType.timeCharge}</Text>
-              <Text style={styles.fee}>元/小时，</Text>
+              <Text style={styles.fee}>元/分钟，</Text>
               <Text style={styles.fee}>车辆里程收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{carInfo.dsCarType.mileageCharge}</Text>
               <Text style={styles.fee}>元/公里</Text>
@@ -496,7 +518,7 @@ class HomeScreen extends React.Component{
             <View style={[styles.row, styles.margin20, styles.margin30]}>
               <Text style={styles.fee}>车辆收费时长</Text>
               <Text style={[styles.fee, styles.fee1]}>{useCarInfo.dsCarType.timeCharge}</Text>
-              <Text style={styles.fee}>元/小时，</Text>
+              <Text style={styles.fee}>元/分钟，</Text>
               <Text style={styles.fee}>车辆里程收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{useCarInfo.dsCarType.mileageCharge}</Text>
               <Text style={styles.fee}>元/公里</Text>
@@ -515,7 +537,7 @@ class HomeScreen extends React.Component{
             <View style={styles.price}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.number}>订单总价： </Text>
-                <Text style={styles.priceNum}>0元</Text>
+                <Text style={styles.priceNum}>{money}元</Text>
               </View>
               <Text style={styles.number}>订单开始时间:  {useCarInfo.startTime ? format(useCarInfo.startTime, 'YYYY/MM/DD HH:mm:ss') : useCarInfo.returnStartTime}</Text>
             </View>
@@ -541,7 +563,7 @@ class HomeScreen extends React.Component{
                 <Text style={styles.blueText}>刷新密码</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.button1, styles.blue]} onPress={() => { this.refundCar(1, useCarInfo.id) }}>
-                <Text style={styles.blueText}>修改还车网点</Text>
+                <Text style={styles.blueText}>更换网点</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
