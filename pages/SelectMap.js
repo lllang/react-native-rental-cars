@@ -4,7 +4,7 @@ import { MapView, Marker, Polygon } from 'react-native-amap3d'
 import { p } from '../utils/resolutions'
 import PropTypes from 'prop-types'
 import Dialog from "react-native-dialog";
-import { post } from '../utils/request'
+import { post, api } from '../utils/request'
 import { SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux'
 import Toast from 'react-native-simple-toast'
@@ -23,11 +23,11 @@ class SelectMap extends React.Component{
   static contextTypes = {
     actions: PropTypes.object
   }
-  static navigationOptions = {
-    title: '选择还车网点',
+  static navigationOptions = ({navigation}) => ({
+    title: `${navigation.getParam('edit', 0) ? '修改' : '选择'}还车网点`,
     headerBackTitle: '返回',
     headerTruncatedBackTitle: '返回',
-  }
+  })
   state = {
     lat: 39.91095,
     firstLat: '',
@@ -80,7 +80,7 @@ class SelectMap extends React.Component{
 
   selectNetwork = () => {
     if (this.props.navigation.getParam('edit')) {
-      post('/api/dsOrder/modifyNet', {
+      api('/api/dsOrder/modifyNet', {
         id: this.props.navigation.getParam('id'),
         endNetworkId: this.state.item.id
       }).then(res => {
@@ -116,7 +116,7 @@ class SelectMap extends React.Component{
         rotateEnabled = {false}
         showsZoomControls = {true}
         zoomLevel = {15}
-        style={{ position: 'absolute', top: p(40), bottom: 0, left: 0, right: 0, zIndex: 1 }}
+        style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, zIndex: 1 }}
         coordinate={{ latitude: Number(firstLat), longitude: Number(firstLng) }}
         onStatusChangeComplete={this._logStatusChangeCompleteEvent}
       >

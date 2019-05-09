@@ -70,7 +70,7 @@ class HomeScreen extends React.Component{
     })
     this.codeBtnHandler = timers.setInterval(() => {
       this.getFee();
-    }, 30000);
+    }, 10000);
   }
   getFee() {
     if (this.state.useCarInfo.id) {
@@ -533,6 +533,9 @@ class HomeScreen extends React.Component{
             <TouchableOpacity style={[styles.point, styles.point1]}>
               <Text style={styles.getCar}>还车点：</Text>
               <Text style={styles.getCarText}>{useCarInfo.endNetworkName}</Text>
+              <TouchableOpacity style={{ marginLeft: p(30) }} onPress={() => { this.refundCar(1, useCarInfo.id) }}>
+                <Text style={[styles.getCarText, styles.fee1]}>更换网点</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
             <View style={styles.price}>
               <View style={{ flexDirection: 'row' }}>
@@ -562,9 +565,7 @@ class HomeScreen extends React.Component{
               <TouchableOpacity style={[styles.button1, styles.blue]} onPress={this.refresh.bind(this)}>
                 <Text style={styles.blueText}>刷新密码</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.button1, styles.blue]} onPress={() => { this.refundCar(1, useCarInfo.id) }}>
-                <Text style={styles.blueText}>更换网点</Text>
-              </TouchableOpacity>
+              
             </View>
           </TouchableOpacity>
         </Mask> : null}
