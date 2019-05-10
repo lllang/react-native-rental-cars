@@ -143,7 +143,7 @@ export default class OrderDetailScreen extends React.Component{
         <View style={styles.items}>
           <View style={styles.item}>
             <Text style={styles.time}>{carInfo.useTime}</Text>
-            <Text style={styles.number}>总时长/小时</Text>
+            <Text style={styles.number}>总时长</Text>
           </View>
           <View style={styles.item}>
             <Text style={styles.time}>{carInfo.totalMile}</Text>

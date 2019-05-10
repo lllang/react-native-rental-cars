@@ -532,7 +532,7 @@ class HomeScreen extends React.Component{
             </TouchableOpacity>
             <TouchableOpacity style={[styles.point, styles.point1]}>
               <Text style={styles.getCar}>还车点：</Text>
-              <Text style={styles.getCarText}>{useCarInfo.endNetworkName}</Text>
+              <Text style={styles.getCarText}>{endNetworkName}</Text>
               <TouchableOpacity style={{ marginLeft: p(30) }} onPress={() => { this.refundCar(1, useCarInfo.id) }}>
                 <Text style={[styles.getCarText, styles.fee1]}>更换网点</Text>
               </TouchableOpacity>
