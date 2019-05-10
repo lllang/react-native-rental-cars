@@ -1,4 +1,4 @@
-package com.demo;
+package com.dishichuxing;
 
 import android.app.Application;
 

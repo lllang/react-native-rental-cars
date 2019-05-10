@@ -532,7 +532,7 @@ class HomeScreen extends React.Component{
             </TouchableOpacity>
             <TouchableOpacity style={[styles.point, styles.point1]}>
               <Text style={styles.getCar}>还车点：</Text>
-              <Text style={styles.getCarText}>{endNetworkName}</Text>
+              <Text style={styles.getCarText}>{endNetworkName || useCarInfo.endNetworkName}</Text>
               <TouchableOpacity style={{ marginLeft: p(30) }} onPress={() => { this.refundCar(1, useCarInfo.id) }}>
                 <Text style={[styles.getCarText, styles.fee1]}>更换网点</Text>
               </TouchableOpacity>
@@ -573,7 +573,7 @@ class HomeScreen extends React.Component{
           this.setState({
             useCarInfo: usingCarInfo,
             showUseCar: true,
-          })
+          }, this.getFee)
         }}><Text>您有行程中的订单，点击查看</Text></TouchableOpacity> : null}
         <Modal visible={visible} onPress={() => {this.setState({visible: false})}}>
           <Text>最新密码为{psw || useCarInfo.password}</Text>

@@ -1,4 +1,4 @@
-package com.demo;
+package com.dishichuxing;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
