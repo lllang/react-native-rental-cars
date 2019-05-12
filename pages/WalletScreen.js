@@ -110,14 +110,16 @@ class WalletScreen extends React.Component{
           </TouchableOpacity>
         </View>
         <View style={styles.deal}>
-        <TouchableOpacity onPress={() => { this.setState({ checked: !this.state.checked })} }>
+          <TouchableOpacity onPress={() => { this.setState({ checked: !this.state.checked })} }>
           <Image
             source={this.state.checked ? IMAGES.checked : IMAGES.check}
             style={styles.check}
           />
           </TouchableOpacity>
           <Text style={styles.dealText}>确认充值即代表您同意蒂时</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            this.props.navigation.push('webview');
+          }}>
             <Text style={styles.dealText1}>《充值协议》</Text>
           </TouchableOpacity>
         </View>

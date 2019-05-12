@@ -30,6 +30,7 @@ import CardAuthScreen from './pages/CardAuthScreen'
 import DriveCardAuthScreen from './pages/DriveCardAuthScreen';
 import OrderDetailScreen from './pages/OrderDetailScreen.js';
 import SelectMap from './pages/SelectMap.js';
+import WebViewScreen from './pages/WebViewScreen.js';
 
 const AppDrawerNavigator = createDrawerNavigator({
   home: HomeScreen,
@@ -53,6 +54,7 @@ const AppNavigator = createStackNavigator({
   cardAuth: CardAuthScreen,
   selectMap: SelectMap,
   driveCardAuth: DriveCardAuthScreen,
+  webview: WebViewScreen,
 }, {
   initialRouteName: 'init'
 })

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import timers from 'react-native-background-timer'
 import { p } from '../utils/resolutions';
 import { post } from '../utils/request';
@@ -11,12 +11,18 @@ import { Loading } from '../utils/loading';
 
 const CODE_TIMEOUT_SECONDS = 60;
 
+const IMAGES = {
+  check: require('../assets/wallet/icon-check.png'),
+  checked: require('../assets/wallet/icon-check-select.png'),
+}
+
 export default class SignUpScreen extends Component{
   state = {
     tel: '',
     password: '',
     repassword: '',
     code: '',
+    checked: false,
     codeBtnDisabled: true,
     codeBtnTxt: '获取验证码',
   }
@@ -28,6 +34,10 @@ export default class SignUpScreen extends Component{
     header: null
   }
   signUp = () => {
+    if (!this.state.checked) {
+      Toast.show('请先同意协议')
+      return;
+    }
     if (!isPhone(this.state.tel) || this.state.password === '') {
       Toast.show('请输入正确的手机号和密码')
       return;
@@ -112,6 +122,20 @@ export default class SignUpScreen extends Component{
             <Text style={[styles.getCodeText, this.state.codeBtnDisabled ? { color: '#999' } : {}]}>{this.state.codeBtnTxt}</Text>
           </TouchableOpacity>
         </View>
+        {this.isSignUp ? <View style={styles.deal}>
+          <TouchableOpacity onPress={() => { this.setState({ checked: !this.state.checked })} }>
+          <Image
+            source={this.state.checked ? IMAGES.checked : IMAGES.check}
+            style={styles.check}
+          />
+          </TouchableOpacity>
+          <Text style={styles.dealText}>确认充值即代表您同意蒂时</Text>
+          <TouchableOpacity onPress={() => {
+            this.props.navigation.push('webview');
+          }}>
+            <Text style={styles.dealText1}>《用车协议》</Text>
+          </TouchableOpacity>
+        </View> : null}
         <TouchableOpacity style={styles.submit} onPress={this.signUp}>
           <Text style={styles.submitText}>{this.isSignUp ? '注册' : '重置'}</Text>
         </TouchableOpacity>
@@ -183,5 +207,29 @@ const styles = StyleSheet.create({
   getCodeText: {
     fontSize: p(16),
     color: '#2b2b2b',
+  },
+  deal: {
+    marginTop: p(40),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: p(50),
+    marginRight: p(50),
+  },
+  check: {
+    width: p(20),
+    height: p(20),
+    marginRight: p(5),
+  },
+  dealText: {
+    color: '#2b2b2b',
+    fontSize: p(13),
+  },
+  dealText1: {
+    color: '#00b1a0',
+    fontSize: p(13),
+  },
+  disabled: {
+    backgroundColor: '#999',
   },
 })

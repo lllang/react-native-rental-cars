@@ -138,8 +138,8 @@ class SelectMap extends React.Component{
           <Dialog.Description>
             确定要选择{item.name}作为停车点吗？
           </Dialog.Description>
-          <Dialog.Button label="确定" onPress={this.selectNetwork} />
           <Dialog.Button label="取消" onPress={this.handleCancel} />
+          <Dialog.Button label="确定" onPress={this.selectNetwork} />
         </Dialog.Container>
       </SafeAreaView>
     )

@@ -6,7 +6,6 @@ import PropTypes from 'prop-types'
 import timers from 'react-native-background-timer'
 import { getAuth } from '../utils/storage'
 import { post, api } from '../utils/request'
-import Picker from '../components/Picker';
 import Mask from '../components/Mask';
 import host from '../utils/config'
 import { SafeAreaView } from 'react-navigation';
@@ -14,6 +13,7 @@ import { connect } from 'react-redux'
 import Toast from 'react-native-simple-toast'
 import format from 'date-fns/format';
 import { Loading } from '../utils/loading';
+import Dialog from "react-native-dialog";
 
 const IMAGES = {
   user: require('../assets/home/icon-user.png'),
@@ -54,6 +54,7 @@ class HomeScreen extends React.Component{
     showTips: false,
     centerLat: '',
     centerLng: '',
+    insuranceFee: 2,
     usingCarInfo: {},
   }
   marker = [];
@@ -67,10 +68,21 @@ class HomeScreen extends React.Component{
       let userInfo = await getAuth();
       this.context.actions.getUserInfo(userInfo.token);
       this.checkUseCar();
+      this.getiInsuranceFee();
     })
     this.codeBtnHandler = timers.setInterval(() => {
       this.getFee();
     }, 10000);
+  }
+
+  getiInsuranceFee() {
+    api('/app/user/insuranceMoney', {}).then((res) => {
+      if(res.data && res.data.success) {
+        this.setState({
+          insuranceFee: res.data.data
+        })
+      }
+    })
   }
   getFee() {
     if (this.state.useCarInfo.id) {
@@ -207,14 +219,20 @@ class HomeScreen extends React.Component{
     this.context.actions.updateSelected({})
   }
 
-  confirmPress(item) {
+  confirmPress() {
     if(!this.props.selected.endNetworkId) {
       Toast.show('请先选择还车网点');
       return;
     }
+    this.setState({
+      dialogVisible: true,
+    })
+  }
+
+  addOrder = () => {
     Loading.show();
     api('/api/dsOrder/addOrder', {
-      carId: item.dsCar.id,
+      carId: this.state.carInfo.dsCar.id,
       startNetworkId: this.state.startNetworkId,
       endNetworkId: this.props.selected.endNetworkId,
       state: 1,
@@ -232,51 +250,8 @@ class HomeScreen extends React.Component{
         Toast.show(res.data && res.data.msg || '用车失败');
       }
     })
-    // this.setState({
-    //   showUseCar: true,
-    //   showCar: false,
-    //   useCarInfo: {carId :"3f78b9b2f58043f7a9404aa03cf20d95",
-    //   carNumber :"闽C98SZ0",
-    //   carTypeName :"宝骏510",
-    //   carTypeSeat :5,
-    //   createTime :1555594747000,
-    //   dsCar :{areaId: "350503", carId: "闽C98SZ0", carType: "1", cityId: "350500", engineId: "undefined",id: '3f78b9b2f58043f7a9404aa03cf20d95', state: 1},
-    //   dsCarType :{id: "1", maxMileageEndurance: "500", mileageBonus: "2", mileageCharge: "12", name: "宝骏510",photo: '/uploads/car/12416937758862.png', price: 150000, seat: 5, timeCharge: 9},
-    //   endNetworkId :"065c1b018b3e46c7b0f41e20736df3a4",
-    //   endNetworkName :"中骏世界城",
-    //   id :"6a3aeb0e2977452e875dd38df762e11e",
-    //   maxMileageEndurance :"500",
-    //   mileageCharge :"12",
-    //   page :0,
-    //   returnCreateTime :"2019-04-18 21:39:07",
-    //   returnStartTime :"2019-04-18 21:39:07",
-    //   size :0,
-    //   startMile :"126",
-    //   startNetworkId :"b5fed486661e4a85b0726a1cc0acdcf3",
-    //   startNetworkName :"东湖公园",
-    //   startOil :"20.0",
-    //   startTime :1555594747000,
-    //   state :1,
-    //   timeCharge :"9",
-    //   userId :"",
-    //   x :0,
-    //   y:0}
-    // });
   }
   
-  getCar = () => {
-    this.refs.picker.show({
-      title: '请选择',
-      options: this.state.netWorkList.map(i => ({ label: i.name, value: i.id })),
-      onSubmit: (option) => {
-        this.setState({
-          startNetworkId: option.value,
-          getCar: option.label,
-        })
-      },
-    })
-  }
-
   refundCar = (edit, id) => {
     this.props.navigation.push('selectMap', { edit, id });
   }
@@ -359,6 +334,10 @@ class HomeScreen extends React.Component{
     })
   }
 
+  handleCancel = () => {
+    this.setState({ dialogVisible: false, item: {} });
+  };
+
   clear() {
     this.setState({
       showCarList: false, // 是否展示车辆列表
@@ -389,7 +368,7 @@ class HomeScreen extends React.Component{
   }
 
   render() {
-    const { carList, firstLat, usingCarInfo, firstLng, money, netWorkList, showTips, showCarList, showCar, carInfo, getCar, showUseCar, useCarInfo, psw, visible } = this.state
+    const { carList, firstLat, usingCarInfo, firstLng, money, insuranceFee, netWorkList, showTips, showCarList, showCar, carInfo, getCar, showUseCar, useCarInfo, psw, visible } = this.state
     const { endNetworkName } = this.props.selected;
     return (
       <SafeAreaView style={styles.container}>
@@ -497,7 +476,7 @@ class HomeScreen extends React.Component{
               <TouchableOpacity style={[styles.button, styles.cancel]} onPress={this.cancelPress}>
                 <Text style={styles.cancelText}>取消</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.pass]} onPress={this.confirmPress.bind(this, carInfo)}>
+              <TouchableOpacity style={[styles.button, styles.pass]} onPress={this.confirmPress.bind(this)}>
                 <Text style={styles.passText}>确认订单</Text>
               </TouchableOpacity>
             </View>
@@ -575,10 +554,14 @@ class HomeScreen extends React.Component{
             showUseCar: true,
           }, this.getFee)
         }}><Text>您有行程中的订单，点击查看</Text></TouchableOpacity> : null}
-        <Modal visible={visible} onPress={() => {this.setState({visible: false})}}>
-          <Text>最新密码为{psw || useCarInfo.password}</Text>
-        </Modal>
-        <Picker ref="picker" />
+        <Dialog.Container visible={this.state.dialogVisible}>
+          <Dialog.Title>提醒</Dialog.Title>
+          <Dialog.Description>
+            使用车辆包含{insuranceFee}元保险费用
+          </Dialog.Description>
+          <Dialog.Button label="取消" onPress={this.handleCancel} />
+          <Dialog.Button label="确定" onPress={this.addOrder} />
+        </Dialog.Container>
       </SafeAreaView>
     )
   }
