@@ -129,11 +129,11 @@ export default class SignUpScreen extends Component{
             style={styles.check}
           />
           </TouchableOpacity>
-          <Text style={styles.dealText}>确认充值即代表您同意蒂时</Text>
+          <Text style={styles.dealText}>我已经详细阅读并同意</Text>
           <TouchableOpacity onPress={() => {
             this.props.navigation.push('webview');
           }}>
-            <Text style={styles.dealText1}>《用车协议》</Text>
+            <Text style={styles.dealText1}>蒂时出行用户协议</Text>
           </TouchableOpacity>
         </View> : null}
         <TouchableOpacity style={styles.submit} onPress={this.signUp}>

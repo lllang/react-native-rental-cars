@@ -118,7 +118,7 @@ class WalletScreen extends React.Component{
           </TouchableOpacity>
           <Text style={styles.dealText}>确认充值即代表您同意蒂时</Text>
           <TouchableOpacity onPress={() => {
-            this.props.navigation.push('webview');
+            this.props.navigation.push('webview', { url: 'https://www.dschuxing.com/agreement/recharge' });
           }}>
             <Text style={styles.dealText1}>《充值协议》</Text>
           </TouchableOpacity>
