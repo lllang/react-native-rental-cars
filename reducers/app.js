@@ -31,12 +31,12 @@ export const updateSelected = (selected) => (dispatch) => {
   dispatch({ type: 'app/set/selected', payload: { selected } })
 }
 
-export const getUserInfo = (token) => async (dispatch) => {
+export const getUserInfo = (token) => async (dispatch, getState) => {
   const { data } = await post(`/app/user/getUserInfo`, {
-    token
+    token: token || getState().app.userInfo.token
   })
   if (data && data.success) {
-    const userInfo = {...data.data, token}
+    const userInfo = {...data.data, token: token || getState().app.userInfo.token}
     dispatch({ type: 'app/set/userInfo', payload: { userInfo } })
   }
 }

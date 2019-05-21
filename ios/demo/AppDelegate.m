@@ -12,6 +12,7 @@
 #import <React/RCTRootView.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
 #import <React/RCTLinkingManager.h>
+#import "AlipayModule.h"
 
 @implementation AppDelegate
 
@@ -20,7 +21,8 @@
   NSURL *jsCodeLocation;
   #ifdef DEBUG
       //开发包
-      jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
+      // jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
+      jsCodeLocation = [NSURL URLWithString:@"http://192.168.1.103:8081/index.ios.bundle?platform=ios&dev=true"];
   #else
       //离线包
       jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/index.ios" withExtension:@"jsbundle"];
@@ -40,10 +42,14 @@
   [self.window makeKeyAndVisible];
   return YES;
 }
+
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
-            options:(NSDictionary<NSString*, id> *)options
+  sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
-  return [RCTLinkingManager application:application openURL:url options:options];
+  if([[sourceApplication substringToIndex:10] isEqualToString:@"com.alipay"]){
+    [AlipayModule handleCallback:url];
+  }
+  return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

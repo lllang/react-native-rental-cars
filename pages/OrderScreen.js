@@ -137,7 +137,11 @@ export default class OrderScreen extends React.Component{
         </View>
         {list && list.length > 0 ? <RefreshListView style={styles.listMain}
         data={list}
-        onHeaderRefresh={() => {}}
+        onHeaderRefresh={() => {
+          this.setState({ pn: 1 }, () => {
+            this.search();
+          });
+        }}
         refreshState={refreshState}
         onFooterRefresh={() => {
           if (hasNext) {

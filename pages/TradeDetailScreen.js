@@ -2,6 +2,7 @@ import RefreshListView, { RefreshState } from 'react-native-refresh-list-view';
 import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { p } from '../utils/resolutions'
+import Toast from 'react-native-simple-toast';
 import { api } from '../utils/request'
 import format from 'date-fns/format';
 
@@ -15,12 +16,14 @@ export default class TradeDetailScreen extends React.Component{
     pn: 1,
     refreshState: RefreshState.Idle,
     hasNext: true,
+    map: {0: "消费", 1: "充值", 2: "提现", 3: "取消提现", 4: "退押金成功", 5: "退押金驳回", 6: "交押金", 7: "车主收益", 8: "城市合伙人收益"},
   }
   search = () => {
     const { pn, ps } = this.state;
     api('/api/MoneyLog/getUserMoneyLog', { size: this.state.ps, page: this.state.pn }).then((res) => {
-      if (res.data && res.data.data && res.data.data.rows && res.data.data.rows.records) {
-        const list = pn === 1 ? res.data.data.rows.records : this.state.list.concat(res.data.data.rows.records);
+      if (res.data && res.data.data && res.data.data.rows) {
+        const list = pn === 1 ? res.data.data.rows : this.state.list.concat(res.data.data.rows);
+        console.log(list);
         const pn1 = pn + 1;
         if (res.data.data.total < pn * ps) {
           this.setState({ hasNext: false, refreshState: RefreshState.NoMoreData });
@@ -30,6 +33,7 @@ export default class TradeDetailScreen extends React.Component{
         this.setState({
           list,
           pn: pn1,
+          map: res.data.data.moneyType
         });
       } else {
         Toast.show(res.data.msg);
@@ -39,11 +43,12 @@ export default class TradeDetailScreen extends React.Component{
   componentDidMount() {
     this.search();
   }
-  renderItem({item}) {
+  renderItem = ({item}) => {
+    console.log(item)
     return (
       <TouchableOpacity style={styles.item}>
         <View style={styles.itemTop}>
-          <Text style={styles.type}>{['消费', '充值', '提现', '取消提现', '退押金成功', '退押金驳回', '交押金'][item.type] || ''}</Text>
+          <Text style={styles.type}>{this.state.map[item.type] || ''}</Text>
           <Text style={styles.num}>{item.num}</Text>
         </View>
         <View style={styles.itemTop}>
@@ -64,7 +69,11 @@ export default class TradeDetailScreen extends React.Component{
       <View style={styles.container}>
         {list && list.length > 0 ? <RefreshListView style={styles.listMain}
         data={list}
-        onHeaderRefresh={() => {}}
+        onHeaderRefresh={() => {
+          this.setState({ pn: 1 }, () => {
+            this.search();
+          });
+        }}
         refreshState={refreshState}
         onFooterRefresh={() => {
           if (hasNext) {
@@ -75,7 +84,9 @@ export default class TradeDetailScreen extends React.Component{
         }}
         keyExtractor={(item) => item.id}
         initialNumToRender={ps}
-        renderItem={this.renderItem} /> : null}
+        renderItem={this.renderItem} /> :
+        <View style={styles.empty}><Text style={styles.emptyText}>暂无记录</Text></View>}
+        
       </View>
     )
   }
@@ -114,4 +125,13 @@ const styles = StyleSheet.create({
     color: '#F96E0F',
     fontSize: p(14),
   },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: p(20),
+    color: '#2b2b2b',
+  }
 })

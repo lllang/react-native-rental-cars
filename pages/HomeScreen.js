@@ -23,6 +23,7 @@ const IMAGES = {
   right: require('../assets/home/icon-right.png'),
   oil: require('../assets/card/icon-electric.png'),
   clear: require('../assets/home/clear.png'),
+  kefu: require('../assets/home/kefu.png'),
 }
 
 class HomeScreen extends React.Component{
@@ -154,7 +155,6 @@ class HomeScreen extends React.Component{
   }
   getPosition() {
     navigator.geolocation.watchPosition((a) => {
-      console.log(a);
       this.setState({
         lat: a.coords.latitude,
         lng: a.coords.longitude,
@@ -164,7 +164,6 @@ class HomeScreen extends React.Component{
         lng: a.coords.longitude,
       })
     }, (b) => {
-      console.log(b);
     }, {
       enableHighAccuracy: true,
       maximumAge: 5000,
@@ -230,6 +229,9 @@ class HomeScreen extends React.Component{
   }
 
   addOrder = () => {
+    this.setState({
+      dialogVisible: false,
+    })
     Loading.show();
     api('/api/dsOrder/addOrder', {
       carId: this.state.carInfo.dsCar.id,
@@ -335,8 +337,12 @@ class HomeScreen extends React.Component{
   }
 
   handleCancel = () => {
-    this.setState({ dialogVisible: false, item: {} });
+    this.setState({ dialogVisible: false });
   };
+
+  openKefu = () => {
+    this.props.navigation.push('webview', { url: 'https://www.dschuxing.com/customerService' });
+  }
 
   clear() {
     this.setState({
@@ -362,7 +368,6 @@ class HomeScreen extends React.Component{
   }
 
   load = (index) => {
-    console.log('load');
     this.marker[index].componentDidUpdate()
     setTimeout(() => this.marker[index].componentDidUpdate(), 200)
   }
@@ -376,12 +381,15 @@ class HomeScreen extends React.Component{
           <TouchableOpacity style={styles.iconUserOpacity} onPress={this.openDrawer}>
             <Image source={IMAGES.user} style={styles.iconUser}/>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.iconKefuOpacity} onPress={this.openKefu}>
+            <Image source={IMAGES.kefu} style={styles.iconKefu}/>
+          </TouchableOpacity>
         </View>
           <MapView
             ref="map"
+            showsCompass={false}
             locationEnabled
             onLocation={({ nativeEvent }) => {
-              console.log(`${nativeEvent.latitude}, ${nativeEvent.longitude}`)
               this.setState({
                 lat: nativeEvent.latitude,
                 lng: nativeEvent.longitude,
@@ -429,10 +437,10 @@ class HomeScreen extends React.Component{
                 <Image source={IMAGES.right} style={styles.right}/>
               </View>
               <View style={[styles.row, styles.margin20]}>
-                <Text style={styles.fee}>车辆收费时长</Text>
+                <Text style={styles.fee}>时长收费</Text>
                 <Text style={[styles.fee, styles.fee1]}>{item.dsCarType.timeCharge}</Text>
                 <Text style={styles.fee}>元/分钟，</Text>
-                <Text style={styles.fee}>车辆里程收费</Text>
+                <Text style={styles.fee}>里程收费</Text>
                 <Text style={[styles.fee, styles.fee1]}>{item.dsCarType.mileageCharge}</Text>
                 <Text style={styles.fee}>元/公里</Text>
               </View>
@@ -451,16 +459,19 @@ class HomeScreen extends React.Component{
               <View style={styles.row}>
                 <Text style={styles.number}>{carInfo.dsCar && carInfo.dsCar.carId}  </Text>
                 {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
-                <Text style={styles.number}>剩余续航{carInfo.dsCar && carInfo.dsCar.extensionMileage}km  最大续航{carInfo.dsCarType.maxMileageEndurance}km</Text>
               </View>
             </View>
+            <Text style={[styles.number, { marginTop: p(5) }]}>剩余续航{carInfo.dsCar && carInfo.dsCar.extensionMileage}km  最大续航{carInfo.dsCarType.maxMileageEndurance}km</Text>
             <View style={[styles.row, styles.margin20]}>
-              <Text style={styles.fee}>车辆收费时长</Text>
+              <Text style={styles.fee}>时长收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{carInfo.dsCarType.timeCharge}</Text>
               <Text style={styles.fee}>元/分钟，</Text>
-              <Text style={styles.fee}>车辆里程收费</Text>
+              <Text style={styles.fee}>里程收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{carInfo.dsCarType.mileageCharge}</Text>
               <Text style={styles.fee}>元/公里</Text>
+            </View>
+            <View style={[styles.row]}>
+              <Text style={styles.number}>使用车辆包含{insuranceFee}元保险费用，试运营期间，时长费6折</Text>
             </View>
             <TouchableOpacity style={[styles.point, styles.borderBottom]}>
               <Text style={styles.getCar}>取车点：</Text>
@@ -476,7 +487,7 @@ class HomeScreen extends React.Component{
               <TouchableOpacity style={[styles.button, styles.cancel]} onPress={this.cancelPress}>
                 <Text style={styles.cancelText}>取消</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.pass]} onPress={this.confirmPress.bind(this)}>
+              <TouchableOpacity style={[styles.button, styles.pass]} onPress={this.addOrder.bind(this)}>
                 <Text style={styles.passText}>确认订单</Text>
               </TouchableOpacity>
             </View>
@@ -491,16 +502,19 @@ class HomeScreen extends React.Component{
               <View style={styles.row}>
                 <Text style={styles.number}>{useCarInfo.dsCar && useCarInfo.dsCar.carId}  </Text>
                 {/* <Image source={IMAGES.oil} style={styles.oil}/> */}
-                <Text style={styles.number}>剩余续航{useCarInfo.dsCar && useCarInfo.dsCar.extensionMileage}km  最大续航{useCarInfo.dsCarType.maxMileageEndurance}km</Text>
               </View>
             </View>
+            <Text style={[styles.number, { marginTop: p(5) }]}>剩余续航{useCarInfo.dsCar && useCarInfo.dsCar.extensionMileage}km  最大续航{useCarInfo.dsCarType.maxMileageEndurance}km</Text>
             <View style={[styles.row, styles.margin20, styles.margin30]}>
-              <Text style={styles.fee}>车辆收费时长</Text>
+              <Text style={styles.fee}>时长收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{useCarInfo.dsCarType.timeCharge}</Text>
               <Text style={styles.fee}>元/分钟，</Text>
-              <Text style={styles.fee}>车辆里程收费</Text>
+              <Text style={styles.fee}>里程收费</Text>
               <Text style={[styles.fee, styles.fee1]}>{useCarInfo.dsCarType.mileageCharge}</Text>
               <Text style={styles.fee}>元/公里</Text>
+            </View>
+            <View style={[styles.row, styles.margin20, styles.margin30]}>
+              <Text style={styles.number}>使用车辆包含{insuranceFee}元保险费用，试运营期间，时长费6折</Text>
             </View>
             <View style={[styles.row, styles.margin20, styles.margin30]}>
               <Text style={{ color: '#df8889' }}>当前用车密码{psw || useCarInfo.password}#</Text>
@@ -557,7 +571,7 @@ class HomeScreen extends React.Component{
         <Dialog.Container visible={this.state.dialogVisible}>
           <Dialog.Title>提醒</Dialog.Title>
           <Dialog.Description>
-            使用车辆包含{insuranceFee}元保险费用
+            使用车辆包含{insuranceFee}元保险费用，试运营期间，时长费6折
           </Dialog.Description>
           <Dialog.Button label="取消" onPress={this.handleCancel} />
           <Dialog.Button label="确定" onPress={this.addOrder} />
@@ -577,8 +591,14 @@ const styles = StyleSheet.create({
     zIndex: 2,
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     width: '100%',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
   },
   iconUser: {
+    height: p(20),
+    width: p(20),
+  },
+  iconKefu: {
     height: p(20),
     width: p(20),
   },
@@ -586,6 +606,12 @@ const styles = StyleSheet.create({
     height: p(20),
     width: p(20),
     marginLeft: p(12),
+    marginTop: p(9),
+  },
+  iconKefuOpacity: {
+    height: p(20),
+    width: p(20),
+    marginRight: p(12),
     marginTop: p(9),
   },
   mask: {
@@ -689,9 +715,9 @@ const styles = StyleSheet.create({
   },
   carInfo: {
     position: 'absolute',
-    height: p(400),
-    left: p(13),
-    right: p(13),
+    height: p(420),
+    left: p(10),
+    right: p(10),
     bottom: p(30),
     backgroundColor: '#fff',
     borderRadius: p(5),
@@ -717,10 +743,10 @@ const styles = StyleSheet.create({
   detailImage: {
     height: p(110),
     width: p(240),
-    marginTop: p(20),
+    marginTop: p(10),
   },
   textView1: {
-    marginTop: p(15),
+    marginTop: p(10),
     flexDirection: 'row',
   },
   point: {
@@ -764,7 +790,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: p(2),
     borderRadius: p(23),
-    height: p(45),
+    height: p(35),
     backgroundColor: '#fff',
     borderColor: '#dbdbdb',
     borderWidth: 1,
@@ -809,7 +835,7 @@ const styles = StyleSheet.create({
     marginTop: p(5),
     marginBottom: p(5),
     width: '100%',
-    padding: p(20),
+    padding: p(10),
     backgroundColor: '#f2f2f2',
   },
   tips: {

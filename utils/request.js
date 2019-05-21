@@ -12,14 +12,25 @@ export function post (url, params) {
   return axios.post(host + url, params)
 }
 
+export function delay(time, ret, callback) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(ret);
+      if (callback) {
+        callback();
+      }
+    }, time)
+  })
+}
+
 export function api(url, params) {
   const state = store.getState();
   if (state.app.userInfo && state.app.userInfo.token) {
-    return axios.post(host + url, params, {
+    return Promise.race([axios.post(host + url, params, {
       headers: {
         Authorization: state.app.userInfo.token
       }
-    })
+    }), delay(5000, { data: { success: false, msg: '请求超时' } })]);
   }
   Toast.show('请先登录');
   navigate('login');

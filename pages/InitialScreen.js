@@ -15,7 +15,7 @@ export default class InitialScreen extends React.Component{
     header: null
   }
   async componentDidMount () {
-    // registerApp('111111111111111');
+    registerApp('wxe9f23ee82bee0aaa');
     if (Platform.OS === 'android') {
       const result = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,

@@ -15,6 +15,7 @@ const IMAGES = {
   trip: require('../assets/home/icon-trip.png'),
   deposit: require('../assets/home/icon-deposit.png'),
   cart: require('../assets/home/icon-cart.png'),
+  about: require('../assets/home/about.png'),
   right: require('../assets/home/icon-right.png'),
 }
 
@@ -38,8 +39,8 @@ class LeftDrawer extends React.Component{
     // Remove the event listener
     this.focusListener && this.focusListener.remove();
   }
-  jump = (route) => {
-    this.props.navigation.navigate(route);
+  jump = (route, params = {}) => {
+    this.props.navigation.navigate(route, params);
   }
   render() {
     const { userInfo } = this.props
@@ -77,6 +78,11 @@ class LeftDrawer extends React.Component{
         <TouchableOpacity style={styles.item} onPress={() => { this.jump('deposit') }}>
           <Image style={styles.itemIcon} source={IMAGES.deposit}/>
           <Text style={styles.itemTitle}>我的押金</Text>
+          <Image style={styles.right} source={IMAGES.right}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => { this.jump('webview', { url: 'https://www.dschuxing.com/about' }) }}>
+          <Image style={styles.itemIcon} source={IMAGES.about}/>
+          <Text style={styles.itemTitle}>关于我们</Text>
           <Image style={styles.right} source={IMAGES.right}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.logoutOpacity} onPress={this.logout}>

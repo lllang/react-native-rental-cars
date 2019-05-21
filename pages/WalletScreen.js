@@ -1,7 +1,11 @@
 import React from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native'
 import Toast from 'react-native-simple-toast';
+import PropTypes from 'prop-types'
+import Alipay from 'react-native-yunpeng-alipay';
 import { connect } from 'react-redux';
+import timers from 'react-native-background-timer'
+import { Loading } from '../utils/loading';
 import { p } from '../utils/resolutions';
 import { api } from '../utils/request';
 import { pay } from 'react-native-wechat';
@@ -12,6 +16,9 @@ const IMAGES = {
 }
 
 class WalletScreen extends React.Component{
+  static contextTypes = {
+    actions: PropTypes.object
+  }
   static navigationOptions = {
     title: '我的钱包',
     headerBackTitle: '返回',
@@ -19,7 +26,7 @@ class WalletScreen extends React.Component{
   }
   state = {
     rechargeArray: [50, 100, 200, 300, 500, 1000],
-    checked: false,
+    checked: true,
     show: true,
     payNum: '',
     recharge: 0,
@@ -31,19 +38,83 @@ class WalletScreen extends React.Component{
       Toast.show('请选勾选协议');
       return;
     }
+    if (show && !payNum) {
+      Toast.show('请输入金额');
+      return;
+    }
     if (payType === 'wechat') {
       api('/api/pay/rechargePrePayInfo', {
         num: show ? payNum : recharge
       }).then(async (res) => {
         if(res.data && res.data.success) {
-          const result = await pay({
-            appId: '1111111111',
-          });
-          console.log(result);
+          const { mch_id, prepay_id, nonce_str, sign } = res.data.data;
+          pay({
+            partnerId: mch_id,
+            prepayId: prepay_id,
+            nonceStr: nonce_str,
+            timeStamp: Date.now(),
+            sign,
+            package: 'Sign=WXPay'
+          }).then(res => {
+            console.log(res, JSON.stringify({
+              partnerId: mch_id,
+              prepayId: prepay_id,
+              nonceStr: nonce_str,
+              timeStamp: Date.now(),
+              sign,
+              package: 'Sign=WXPay'
+            }));
+          }, rej => {
+            console.log(rej)
+          }).catch(e => {
+            console.log(e);
+          })
         } else {
-          console.log(res);
         }
       })
+    } else {
+      api('/api/pay/rechargePrePayInfoByALiPay', {
+        num: show ? payNum : recharge
+      }).then((res) => {
+        if (res.data && res.data.data) {
+          this.alipay(res);
+        } else {
+          Toast.show(res.data && res.data.msg || '支付失败');
+        }
+      })
+    }
+  }
+  async alipay(res) {
+    const data = await Alipay.pay(res.data.data);
+    if (data) {
+      Loading.show('充值中');
+      this.codeBtnHandler = timers.setInterval(async () => {
+        const data = await api('/api/pay/rechargeResult', {
+          id: res.data.order_id
+        })
+        if (!data.data || !data.data.success) {
+          Toast.show('充值失败');
+          Loading.hidden();
+          this.context.actions.getUserInfo();
+          this.codeBtnHandler && timers.clearInterval(this.codeBtnHandler);
+          this.timer && timers.clearTimeout(this.timer);
+        }
+        if (data.data && data.data.success && data.data.result) {
+          Toast.show('充值成功');
+          Loading.hidden();
+          this.context.actions.getUserInfo();
+          this.codeBtnHandler && timers.clearInterval(this.codeBtnHandler);
+          this.timer && timers.clearTimeout(this.timer);
+        }
+      }, 1000);
+      this.timer = timers.setTimeout(() => {
+        Loading.hidden();
+        Toast.show('超时未到账，请稍后查看余额');
+        this.context.actions.getUserInfo();
+        this.codeBtnHandler && timers.clearInterval(this.codeBtnHandler);
+      }, 5000)
+    } else {
+      Toast.show('充值失败');
     }
   }
   render() {
