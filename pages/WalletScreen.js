@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView, Platform, AppState } from 'react-native'
 import Toast from 'react-native-simple-toast';
 import PropTypes from 'prop-types'
 import Alipay from 'react-native-yunpeng-alipay';
@@ -47,29 +47,43 @@ class WalletScreen extends React.Component{
         num: show ? payNum : recharge
       }).then(async (res) => {
         if(res.data && res.data.success) {
-          const { mch_id, prepay_id, nonce_str, sign } = res.data.data;
-          pay({
-            partnerId: mch_id,
-            prepayId: prepay_id,
-            nonceStr: nonce_str,
-            timeStamp: Date.now(),
-            sign,
-            package: 'Sign=WXPay'
-          }).then(res => {
-            console.log(res, JSON.stringify({
-              partnerId: mch_id,
-              prepayId: prepay_id,
-              nonceStr: nonce_str,
-              timeStamp: Date.now(),
+          const { partnerid, noncestr, prepayid, sign, timestamp } = res.data.data;
+          let param = {}
+          if (Platform.OS === 'android') {
+            param = {
+              partnerId: partnerid,
+              prepayId: prepayid,
+              nonceStr: noncestr,
+              timeStamp: `${timestamp}`,
               sign,
-              package: 'Sign=WXPay'
-            }));
+              package: 'Sign=WXPay',
+            }
+          } else {
+            param = {
+              partnerId: partnerid,
+              prepayId: prepayid,
+              nonceStr: noncestr,
+              timeStamp: timestamp,
+              sign,
+              package: 'Sign=WXPay',
+            }
+          }
+          pay(param).then(r => {
+            console.log(r);
+            if (r.errCode === 0) {
+              this.roll(res.data.order_id);
+            } else {
+              Toast.show('支付失败');
+            }
           }, rej => {
-            console.log(rej)
+            console.log(rej);
+            Toast.show('支付失败');
           }).catch(e => {
             console.log(e);
+            Toast.show('支付失败');
           })
         } else {
+          Toast.show('支付失败');
         }
       })
     } else {
@@ -86,11 +100,18 @@ class WalletScreen extends React.Component{
   }
   async alipay(res) {
     const data = await Alipay.pay(res.data.data);
+    console.log(data)
     if (data) {
-      Loading.show('充值中');
+      this.roll(res.data.order_id);
+    } else {
+      Toast.show('充值失败');
+    }
+  }
+  roll(orderId) {
+    Loading.show('充值中');
       this.codeBtnHandler = timers.setInterval(async () => {
         const data = await api('/api/pay/rechargeResult', {
-          id: res.data.order_id
+          id: orderId
         })
         if (!data.data || !data.data.success) {
           Toast.show('充值失败');
@@ -113,9 +134,6 @@ class WalletScreen extends React.Component{
         this.context.actions.getUserInfo();
         this.codeBtnHandler && timers.clearInterval(this.codeBtnHandler);
       }, 5000)
-    } else {
-      Toast.show('充值失败');
-    }
   }
   render() {
     const { userInfo } = this.props

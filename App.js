@@ -56,7 +56,11 @@ const AppNavigator = createStackNavigator({
   driveCardAuth: DriveCardAuthScreen,
   webview: WebViewScreen,
 }, {
-  initialRouteName: 'init'
+  initialRouteName: 'init',
+  defaultNavigationOptions: {
+    headerBackTitle: '返回',
+    headerTruncatedBackTitle: '返回',
+  }
 })
 
 const AppContainer = createAppContainer(AppNavigator);

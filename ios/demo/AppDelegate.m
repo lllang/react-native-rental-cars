@@ -22,7 +22,7 @@
   #ifdef DEBUG
       //开发包
       // jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
-      jsCodeLocation = [NSURL URLWithString:@"http://192.168.1.103:8081/index.ios.bundle?platform=ios&dev=true"];
+      jsCodeLocation = [NSURL URLWithString:@"http://172.23.162.51:8081/index.ios.bundle?platform=ios&dev=true"];
   #else
       //离线包
       jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"bundle/index.ios" withExtension:@"jsbundle"];
@@ -48,6 +48,7 @@
 {
   if([[sourceApplication substringToIndex:10] isEqualToString:@"com.alipay"]){
     [AlipayModule handleCallback:url];
+    return YES;
   }
   return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
