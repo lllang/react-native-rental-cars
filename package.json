@@ -32,7 +32,7 @@
     "react-native-simple-toast": "0.0.8",
     "react-native-vector-icons": "^6.4.2",
     "react-native-webview": "^5.8.1",
-    "react-native-wechat": "^1.9.10",
+    "react-native-wechat": "https://github.com/lllang/react-native-wechat#master",
     "react-native-yunpeng-alipay": "https://github.com/lllang/react-native-yunpeng-alipay#master",
     "react-navigation": "^3.6.0",
     "react-redux": "^7.0.1",
