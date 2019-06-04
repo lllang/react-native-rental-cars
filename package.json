@@ -33,7 +33,7 @@
     "react-native-vector-icons": "^6.4.2",
     "react-native-webview": "^5.8.1",
     "react-native-wechat": "^1.9.10",
-    "react-native-yunpeng-alipay": "^2.0.0",
+    "react-native-yunpeng-alipay": "https://github.com/lllang/react-native-yunpeng-alipay#master",
     "react-navigation": "^3.6.0",
     "react-redux": "^7.0.1",
     "redux": "^4.0.1",

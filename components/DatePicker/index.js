@@ -63,7 +63,7 @@ class DiorDatePicker extends Component {
           </TouchableOpacity>
           <View style={ styles.body }>
             <DatePicker date={ this.state.value }
-              locale={ Platform.OS === 'ios' ? undefined : this.state.locale }
+              locale={ this.state.locale }
               hourMode={ 24 }
               mode={ this.state.mode }
               maximumDate={ this.state.maximumDate }

@@ -414,7 +414,7 @@ class HomeScreen extends React.Component{
             </Marker>
             ) : null}
             {netWorkList && netWorkList.length > 0 ? netWorkList.map((item, index) => 
-              <Polygon key={index} coordinates={item.apiNetWorkPointList.map(i => ({latitude: Number(i.latitude), longitude: Number(i.longitude)}))} strokeWidth={3} strokeColor="#999" fillColor="transparent"/>
+              <Polygon key={item.id} coordinates={item.apiNetWorkPointList.map(i => ({latitude: Number(i.latitude), longitude: Number(i.longitude)}))} strokeWidth={3} strokeColor="#999" fillColor="transparent"/>
             ) : null}
             </MapView>
         {showCarList ? <Mask onPress={this.clear.bind(this)}>

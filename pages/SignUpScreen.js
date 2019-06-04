@@ -34,7 +34,7 @@ export default class SignUpScreen extends Component{
     header: null
   }
   signUp = () => {
-    if (!this.state.checked) {
+    if (!this.state.checked && this.isSignUp) {
       Toast.show('请先同意协议')
       return;
     }

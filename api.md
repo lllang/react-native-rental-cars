@@ -39,3 +39,7 @@ curl 'https://www.dschuxing.com/app/dsCarNetworkUse/getNetCar' -H 'Accept-Encodi
 
 支付接口 /api/dsOrder/orderClosing 404，
 身份证认证那个问题是，提交接口调用成功之后，再调用获取用户信息接口 /api/dsUserInfo/info 返回的始终是空数组
+
+1. 点了红点显示用车列表之后将用车列表关掉再点击这个点，不响应点击事件
+2. Polygon 不显示
+3. 第一次唤起高德地图的时候唤起不了，第二次就好了
