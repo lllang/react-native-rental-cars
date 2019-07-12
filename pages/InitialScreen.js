@@ -52,8 +52,7 @@ export default class InitialScreen extends React.Component{
             this.props.navigation.replace('home');
             this.context.actions.updateUserInfo(userInfo);
           } else {
-            this.props.navigation.replace('home');
-            this.context.actions.updateUserInfo(userInfo);
+            this.props.navigation.replace('login');
           }
         })
       } else {
